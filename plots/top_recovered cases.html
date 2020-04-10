@@ -1,0 +1,85 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    
+      <meta charset="utf-8">
+      <title>Bokeh Plot</title>
+      
+      
+        
+          
+        
+        
+          
+        <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.1.min.js" integrity="sha384-JpP8FXbgAZLkfur7LiK3j9AGBhHNIvF742meBJrjO2ShJDhCG2I1uVvW+0DUtrmc" crossorigin="anonymous"></script>
+        <script type="text/javascript">
+            Bokeh.set_log_level("info");
+        </script>
+        
+      
+      
+    
+  </head>
+  
+  
+  <body>
+    
+      
+        
+          
+          
+            
+              <div class="bk-root" id="3b61eab9-89cf-44cb-81fb-066c63f4a9d8" data-root-id="1339"></div>
+            
+          
+        
+      
+      
+        <script type="application/json" id="1516">
+          {"d77d57e6-c097-4a6d-ac7a-419efc0a5f36":{"roots":{"references":[{"attributes":{"below":[{"id":"1350"}],"center":[{"id":"1352"},{"id":"1356"}],"left":[{"id":"1353"}],"plot_width":840,"renderers":[{"id":"1363"}],"title":{"id":"1340"},"toolbar":{"id":"1358"},"x_range":{"id":"1342"},"x_scale":{"id":"1346"},"y_range":{"id":"1344"},"y_scale":{"id":"1348"}},"id":"1339","subtype":"Figure","type":"Plot"},{"attributes":{"axis":{"id":"1353"},"dimension":1,"ticker":null},"id":"1356","type":"Grid"},{"attributes":{"use_scientific":false},"id":"1365","type":"BasicTickFormatter"},{"attributes":{},"id":"1354","type":"BasicTicker"},{"attributes":{"callback":null,"tooltips":[["Country","@Country"],["Totals","@totals{0,000}"]]},"id":"1366","type":"HoverTool"},{"attributes":{},"id":"1348","type":"LinearScale"},{"attributes":{},"id":"1387","type":"CategoricalTickFormatter"},{"attributes":{"active_drag":"auto","active_inspect":"auto","active_multi":null,"active_scroll":"auto","active_tap":"auto","tools":[{"id":"1357"},{"id":"1366"}]},"id":"1358","type":"Toolbar"},{"attributes":{"axis":{"id":"1350"},"grid_line_color":null,"ticker":null},"id":"1352","type":"Grid"},{"attributes":{"source":{"id":"1338"}},"id":"1364","type":"CDSView"},{"attributes":{"data_source":{"id":"1338"},"glyph":{"id":"1361"},"hover_glyph":null,"muted_glyph":null,"nonselection_glyph":{"id":"1362"},"selection_glyph":null,"view":{"id":"1364"}},"id":"1363","type":"GlyphRenderer"},{"attributes":{"fill_alpha":{"value":0.1},"fill_color":{"value":"#1f77b4"},"line_alpha":{"value":0.1},"line_color":{"value":"#1f77b4"},"top":{"field":"totals"},"width":{"value":0.9},"x":{"field":"Country"}},"id":"1362","type":"VBar"},{"attributes":{"fill_alpha":{"value":0.5},"fill_color":{"value":"#1f77b4"},"line_alpha":{"value":0.5},"line_color":{"value":"#1f77b4"},"top":{"field":"totals"},"width":{"value":0.9},"x":{"field":"Country"}},"id":"1361","type":"VBar"},{"attributes":{},"id":"1351","type":"CategoricalTicker"},{"attributes":{},"id":"1346","type":"CategoricalScale"},{"attributes":{"axis_label":"Totals","formatter":{"id":"1365"},"ticker":{"id":"1354"}},"id":"1353","type":"LinearAxis"},{"attributes":{"factors":["China","Germany","Spain","Iran","Italy","US","France","Switzerland","Korea, South","Austria","Belgium","Canada","Turkey","Denmark","Malaysia","Australia","Peru","Chile","Israel","Thailand"]},"id":"1342","type":"FactorRange"},{"attributes":{},"id":"1388","type":"Selection"},{"attributes":{"start":0},"id":"1344","type":"DataRange1d"},{"attributes":{},"id":"1357","type":"SaveTool"},{"attributes":{"axis_label":"Country","formatter":{"id":"1387"},"major_label_orientation":1,"ticker":{"id":"1351"}},"id":"1350","type":"CategoricalAxis"},{"attributes":{},"id":"1389","type":"UnionRenderers"},{"attributes":{"text":"Top Countries with recovered cases on 2020-04-09"},"id":"1340","type":"Title"},{"attributes":{"data":{"4/9/20":[77679,52407,52165,32309,28470,25410,23413,10600,6973,5240,5164,5162,2142,1883,1608,1472,1438,1274,1011,940],"Country":["China","Germany","Spain","Iran","Italy","US","France","Switzerland","Korea, South","Austria","Belgium","Canada","Turkey","Denmark","Malaysia","Australia","Peru","Chile","Israel","Thailand"],"totals":[77679,52407,52165,32309,28470,25410,23413,10600,6973,5240,5164,5162,2142,1883,1608,1472,1438,1274,1011,940]},"selected":{"id":"1388"},"selection_policy":{"id":"1389"}},"id":"1338","type":"ColumnDataSource"}],"root_ids":["1339"]},"title":"Bokeh Application","version":"2.0.1"}}
+        </script>
+        <script type="text/javascript">
+          (function() {
+            var fn = function() {
+              Bokeh.safely(function() {
+                (function(root) {
+                  function embed_document(root) {
+                    
+                  var docs_json = document.getElementById('1516').textContent;
+                  var render_items = [{"docid":"d77d57e6-c097-4a6d-ac7a-419efc0a5f36","root_ids":["1339"],"roots":{"1339":"3b61eab9-89cf-44cb-81fb-066c63f4a9d8"}}];
+                  root.Bokeh.embed.embed_items(docs_json, render_items);
+                
+                  }
+                  if (root.Bokeh !== undefined) {
+                    embed_document(root);
+                  } else {
+                    var attempts = 0;
+                    var timer = setInterval(function(root) {
+                      if (root.Bokeh !== undefined) {
+                        clearInterval(timer);
+                        embed_document(root);
+                      } else {
+                        attempts++;
+                        if (attempts > 100) {
+                          clearInterval(timer);
+                          console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+                        }
+                      }
+                    }, 10, root)
+                  }
+                })(window);
+              });
+            };
+            if (document.readyState != "loading") fn();
+            else document.addEventListener("DOMContentLoaded", fn);
+          })();
+        </script>
+    
+  </body>
+  
+</html>

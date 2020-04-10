@@ -1,0 +1,85 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    
+      <meta charset="utf-8">
+      <title>Bokeh Plot</title>
+      
+      
+        
+          
+        
+        
+          
+        <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.1.min.js" integrity="sha384-JpP8FXbgAZLkfur7LiK3j9AGBhHNIvF742meBJrjO2ShJDhCG2I1uVvW+0DUtrmc" crossorigin="anonymous"></script>
+        <script type="text/javascript">
+            Bokeh.set_log_level("info");
+        </script>
+        
+      
+      
+    
+  </head>
+  
+  
+  <body>
+    
+      
+        
+          
+          
+            
+              <div class="bk-root" id="11f98149-3a53-439b-aa0e-a2662798eb33" data-root-id="1160"></div>
+            
+          
+        
+      
+      
+        <script type="application/json" id="1330">
+          {"d1e10a3e-c3f0-4ec8-859f-dcc41c5f3655":{"roots":{"references":[{"attributes":{"below":[{"id":"1171"}],"center":[{"id":"1173"},{"id":"1177"}],"left":[{"id":"1174"}],"plot_width":840,"renderers":[{"id":"1184"}],"title":{"id":"1161"},"toolbar":{"id":"1179"},"x_range":{"id":"1163"},"x_scale":{"id":"1167"},"y_range":{"id":"1165"},"y_scale":{"id":"1169"}},"id":"1160","subtype":"Figure","type":"Plot"},{"attributes":{"active_drag":"auto","active_inspect":"auto","active_multi":null,"active_scroll":"auto","active_tap":"auto","tools":[{"id":"1178"},{"id":"1187"}]},"id":"1179","type":"Toolbar"},{"attributes":{"text":"Top Countries with deaths on 2020-04-09"},"id":"1161","type":"Title"},{"attributes":{"axis":{"id":"1174"},"dimension":1,"ticker":null},"id":"1177","type":"Grid"},{"attributes":{"source":{"id":"1159"}},"id":"1185","type":"CDSView"},{"attributes":{"fill_alpha":{"value":0.5},"fill_color":{"value":"#1f77b4"},"line_alpha":{"value":0.5},"line_color":{"value":"#1f77b4"},"top":{"field":"totals"},"width":{"value":0.9},"x":{"field":"Country"}},"id":"1182","type":"VBar"},{"attributes":{},"id":"1202","type":"Selection"},{"attributes":{"factors":["Italy","US","Spain","France","United Kingdom","Iran","China","Germany","Belgium","Netherlands","Brazil","Switzerland","Turkey","Sweden","Canada","Portugal","Austria","Indonesia","Ecuador","Ireland"]},"id":"1163","type":"FactorRange"},{"attributes":{"use_scientific":false},"id":"1186","type":"BasicTickFormatter"},{"attributes":{"axis_label":"Country","formatter":{"id":"1201"},"major_label_orientation":1,"ticker":{"id":"1172"}},"id":"1171","type":"CategoricalAxis"},{"attributes":{},"id":"1167","type":"CategoricalScale"},{"attributes":{"callback":null,"tooltips":[["Country","@Country"],["Totals","@totals{0,000}"]]},"id":"1187","type":"HoverTool"},{"attributes":{"start":0},"id":"1165","type":"DataRange1d"},{"attributes":{"data_source":{"id":"1159"},"glyph":{"id":"1182"},"hover_glyph":null,"muted_glyph":null,"nonselection_glyph":{"id":"1183"},"selection_glyph":null,"view":{"id":"1185"}},"id":"1184","type":"GlyphRenderer"},{"attributes":{},"id":"1169","type":"LinearScale"},{"attributes":{"fill_alpha":{"value":0.1},"fill_color":{"value":"#1f77b4"},"line_alpha":{"value":0.1},"line_color":{"value":"#1f77b4"},"top":{"field":"totals"},"width":{"value":0.9},"x":{"field":"Country"}},"id":"1183","type":"VBar"},{"attributes":{"axis_label":"Totals","formatter":{"id":"1186"},"ticker":{"id":"1175"}},"id":"1174","type":"LinearAxis"},{"attributes":{},"id":"1201","type":"CategoricalTickFormatter"},{"attributes":{},"id":"1203","type":"UnionRenderers"},{"attributes":{},"id":"1172","type":"CategoricalTicker"},{"attributes":{},"id":"1175","type":"BasicTicker"},{"attributes":{"axis":{"id":"1171"},"grid_line_color":null,"ticker":null},"id":"1173","type":"Grid"},{"attributes":{"data":{"4/9/20":[18279,16478,15447,12228,7993,4110,3339,2607,2523,2403,950,948,908,793,503,409,295,280,272,263],"Country":["Italy","US","Spain","France","United Kingdom","Iran","China","Germany","Belgium","Netherlands","Brazil","Switzerland","Turkey","Sweden","Canada","Portugal","Austria","Indonesia","Ecuador","Ireland"],"totals":[18279,16478,15447,12228,7993,4110,3339,2607,2523,2403,950,948,908,793,503,409,295,280,272,263]},"selected":{"id":"1202"},"selection_policy":{"id":"1203"}},"id":"1159","type":"ColumnDataSource"},{"attributes":{},"id":"1178","type":"SaveTool"}],"root_ids":["1160"]},"title":"Bokeh Application","version":"2.0.1"}}
+        </script>
+        <script type="text/javascript">
+          (function() {
+            var fn = function() {
+              Bokeh.safely(function() {
+                (function(root) {
+                  function embed_document(root) {
+                    
+                  var docs_json = document.getElementById('1330').textContent;
+                  var render_items = [{"docid":"d1e10a3e-c3f0-4ec8-859f-dcc41c5f3655","root_ids":["1160"],"roots":{"1160":"11f98149-3a53-439b-aa0e-a2662798eb33"}}];
+                  root.Bokeh.embed.embed_items(docs_json, render_items);
+                
+                  }
+                  if (root.Bokeh !== undefined) {
+                    embed_document(root);
+                  } else {
+                    var attempts = 0;
+                    var timer = setInterval(function(root) {
+                      if (root.Bokeh !== undefined) {
+                        clearInterval(timer);
+                        embed_document(root);
+                      } else {
+                        attempts++;
+                        if (attempts > 100) {
+                          clearInterval(timer);
+                          console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+                        }
+                      }
+                    }, 10, root)
+                  }
+                })(window);
+              });
+            };
+            if (document.readyState != "loading") fn();
+            else document.addEventListener("DOMContentLoaded", fn);
+          })();
+        </script>
+    
+  </body>
+  
+</html>
