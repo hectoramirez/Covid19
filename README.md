@@ -16,4 +16,4 @@ Along the notebook, we
 
 ## Interactive plots
 
-The data and the visualizations are updated daily and can be found in [this simple page](https://hectoramirez.github.io/covid/COVID19.html).
+The data and the visualizations are updated daily and can be found in [this site](https://hectoramirez.github.io/covid/COVID19.html).
