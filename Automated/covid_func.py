@@ -21,7 +21,7 @@ def CovidPlots():
     }
     sns.set_style(custom_style)
 
-    os.chdir('/Users/hramirez/GitHub/Covid19/Automated ')
+    os.chdir('/Users/hramirez/GitHub/Covid19/Automated')
 
     # =========================================================================================  import
 
