@@ -1,7 +1,7 @@
 from git import Repo
 import os
 
-os.chdir('/Users/hramirez/GitHub/hectoramirez.github.io/covid')
+os.chdir('/Users/hramirez/GitHub/hectoramirez.github.io/covid ')
 
 PATH_OF_GIT_REPO = r'/Users/hramirez/GitHub/hectoramirez.github.io/.git'  # make sure .git folder is properly configured
 COMMIT_MESSAGE = 'Daily update'
