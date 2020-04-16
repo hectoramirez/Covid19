@@ -42,6 +42,14 @@ def CovidPlots():
 
     # =========================================================================================  clean
 
+    def dropDP(dF):
+        # Drop the Diamond Princess entry
+        DP = dF['Province/State'] == 'Diamond Princess'
+        dF.drop(dF[DP].index, inplace=True)
+        return dF.reset_index()
+
+    sets = [dropDP(i) for i in sets]
+
     for i in range(3):
         sets[i].rename(columns={'Country/Region': 'Country', 'Province/State': 'State'}, inplace=True)
         sets[i][['State']] = sets[i][['State']].fillna('')
@@ -61,7 +69,7 @@ def CovidPlots():
         # Bokeh bar plots. The function takes a dataframe, datF, as the one provided by the raw data
         # (dates as columns, countries as rows). It first takes the last column as yesterday's date.
 
-        from bokeh.io import output_file, save
+        from bokeh.io import output_file, show, output_notebook, save
         from bokeh.plotting import figure
         from bokeh.models import ColumnDataSource, HoverTool
         from bokeh.palettes import Spectral6
@@ -104,12 +112,13 @@ def CovidPlots():
         return save(p, 'top_{}.html'.format(case))
 
     def bokehB_mort(num=100):
+
         # Bokeh bar plots. The function already includes the confirmed and deaths dataframes,
         # and operates over them to calculate th mortality rate depending on num (number of
         # minimum deaths to consider for a country). The rest is equivalent to the BokehB()
         # function.
 
-        from bokeh.io import output_file, save
+        from bokeh.io import output_file, show, output_notebook, save
         from bokeh.plotting import figure
         from bokeh.models import ColumnDataSource, HoverTool
         from bokeh.palettes import Spectral10
@@ -168,49 +177,46 @@ def CovidPlots():
 
     # =========================================================================================  daily cases
 
-    # How many top countries?
-    n_top = 10
-    # Rolling over how many days?
     roll = 7
-    # Since how many confirmed cases?
-    conf = 100
-    # Since how many deaths?
-    death = 3
 
-    def dailyC(df, n_cat, n_top=n_top):
+    def daily(n_top=10):
 
-        """ Daily cases """
+        # compute daily values for the n_top countries
+        sets_grouped_daily = [df.sort_values(by=yesterday, ascending=False).iloc[:n_top, 2:].diff(axis=1).T
+                              for df in sets_grouped]
 
-        # n_cat = number of cases since we start counting
-        # n_top = number of top countries to show
+        return sets_grouped_daily
 
-        # Choose top countries
-        top = df.sort_values(by=yesterday, ascending=False).iloc[:n_top, 2:].T
-        top.head()
+    def rolling(n_since=100, roll=roll):
 
-        # Compute daily cases
-        daily = top.diff()
+        # transform to rolling average
+        dFs = daily()
 
-        top_countries = daily.columns
-        dfs = []
-        for i in top_countries:
-            dfs.append(pd.DataFrame(daily[i][daily[i] >= n_cat].reset_index(drop=True)))
-        df = pd.concat(dfs, axis=1, join='outer').rolling(roll).mean()
+        sets_grouped_daily_top_rolled = []
+        for i in range(3):  # Transform each dataset at a time
+            dF = dFs[i]
+            top_countries = dF.columns
+            # get the rolling mean
+            dF = dF.rolling(roll).mean()
+            # for each column in a DF, get rows >= n_since and reset index
+            since = [pd.DataFrame(dF[i][dF[i] >= n_since].reset_index(drop=True)) for i in top_countries]
+            # concatenate the columns
+            sets_grouped_daily_top_rolled.append(pd.concat(since, axis=1, join='outer'))
 
-        return df
+        return sets_grouped_daily_top_rolled
 
-    def bokeh_plot(dataF, cat, n_cat, tickers, n_top=n_top):
+    def bokeh_plot(dataF, cat, n_since, tickers, n_top=10):
 
-        """ Constumizations for the Bokeh plots """
+        ''' Customizations for the Bokeh plots '''
         # cat = {'confirmed', 'deaths', 'recoveries'}
-        # n_cat = number of cases since we start counting
+        # n_since = number of cases since we start counting
         # n_top = number of top countries to show
         # tickers = customized tickers for the logy axis. It is simpler to manually define
         # them than to compute them for each case.
 
-        from bokeh.io import output_file
+        from bokeh.io import output_notebook, output_file, show, reset_output
         from bokeh.plotting import figure, save
-        from bokeh.models import HoverTool
+        from bokeh.models import ColumnDataSource, NumeralTickFormatter, HoverTool
         from bokeh.palettes import Category20
 
         # Specify the selection tools to be made available
@@ -224,18 +230,18 @@ def CovidPlots():
         ]
 
         p = figure(y_axis_type="log", plot_width=840, plot_height=600,
-                   x_axis_label='Number of days since {} daily {} first recorded'.format(n_cat, cat),
+                   x_axis_label='Days since average daily {} passed {}'.format(cat, n_since),
                    y_axis_label='',
                    title=
                    'Daily {} ({}-day rolling average) by number of days ' \
                    'since {} cases - top {} countries ' \
-                   '(as of {})'.format(cat, roll, n_cat, n_top, today_date),
+                   '(as of {})'.format(cat, roll, n_since, n_top, today_date),
                    toolbar_location='right', tools=select_tools)
 
         for i in range(n_top):
-            p.line(dataF.index[6:], dataF.iloc[6:, i], line_width=2, color=Category20[20][i], alpha=0.8,
+            p.line(dataF.index[:], dataF.iloc[:, i], line_width=2, color=Category20[20][i], alpha=0.8,
                    legend_label=dataF.columns[i], name=dataF.columns[i])
-            p.circle(dataF.index[6:], dataF.iloc[6:, i], color=Category20[20][i], fill_color='white',
+            p.circle(dataF.index[:], dataF.iloc[:, i], color=Category20[20][i], fill_color='white',
                      size=3, alpha=0.8, legend_label=dataF.columns[i], name=dataF.columns[i])
 
         p.yaxis.ticker = tickers
@@ -249,15 +255,17 @@ def CovidPlots():
 
         return save(p, 'Daily_{}.html'.format(cat))
 
-    yticks_conf = [200, 500, 1000, 2000, 5000, 10000, 20000]
-    bokeh_plot(dailyC(sets_grouped[0], conf), 'confirmed', conf, yticks_conf)
+    # Remember: rolling() throws a list of dataframes where {'confirmed': 0, 'deaths': 1, 'confirmed':2}
 
-    yticks_death = [5, 10, 20, 50, 100, 200, 500, 1000, 2000]
-    bokeh_plot(dailyC(sets_grouped[1], death), 'deaths', death, yticks_death)
+    yticks = [200, 500, 1000, 2000, 5000, 10000, 20000]
+    bokeh_plot(rolling()[0], 'confirmed', n_since=100, tickers=yticks)
+
+    yticks = [5, 10, 20, 50, 100, 200, 500, 1000, 2000]
+    bokeh_plot(rolling(n_since=3)[1], 'deaths', n_since=3, tickers=yticks)
 
     # =========================================================================================  geo visualizations
 
-    fig = px.scatter_geo(world_confirmed,
+    fig = px.scatter_geo(sets[0],
                          lat="Lat", lon="Long", color=yesterday,
                          hover_name="Country", size=yesterday,
                          size_max=40,
@@ -266,7 +274,7 @@ def CovidPlots():
 
     plty.offline.plot(fig, filename='Geo_confirmed.html', auto_open=False)
 
-    fig = px.scatter_geo(world_deaths,
+    fig = px.scatter_geo(sets[1],
                          lat="Lat", lon="Long", color=yesterday,
                          hover_name="Country", size=yesterday,
                          size_max=40,
