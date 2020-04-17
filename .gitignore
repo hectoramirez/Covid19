@@ -25,3 +25,4 @@ Automated/top_confirmed cases.html
 Automated/top_deaths.html
 Automated/top_mortality.html
 Automated/top_recovered cases.html
+plotly_to_html.py
