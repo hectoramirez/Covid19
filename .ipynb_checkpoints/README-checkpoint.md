@@ -6,7 +6,7 @@ Set of charts automatically updated daily with [Apache Airflow](https://airflow.
 
 * __A Medium Story of this project was featured in [Towards Data Science](https://medium.com/p/your-live-covid-19-tracker-with-airflow-and-github-pages-658c3e048304?source=email-2e35a42940fd--writer.postDistributed&sk=343b8c88e348ff738b1f947c38076c97)__
 
-[![Licence](https://img.shields.io/badge/Licence-MIT-red)]((https://opensource.org/licenses/MIT))
+[![Licence](https://img.shields.io/badge/Licence-MIT-red)](https://opensource.org/licenses/MIT)
 [![COVID-19 Tracker](https://img.shields.io/badge/COVID--19-Tracker-green)](https://hectoramirez.github.io/covid/COVID19.html)
 [![Medium](https://img.shields.io/badge/Medium-Story-informational)](https://medium.com/p/your-live-covid-19-tracker-with-airflow-and-github-pages-658c3e048304?source=email-2e35a42940fd--writer.postDistributed&sk=343b8c88e348ff738b1f947c38076c97)
 
