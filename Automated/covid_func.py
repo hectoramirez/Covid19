@@ -7,6 +7,7 @@ def CovidPlots():
 
     import os
     import pandas as pd
+    import numpy as np
     import datetime
     import plotly.express as px
     import plotly as plty
@@ -187,6 +188,19 @@ def CovidPlots():
 
         return sets_grouped_daily
 
+    def replace_outliers(series):
+        # Calculate the absolute difference of each timepoint from the series mean
+        absolute_differences_from_mean = np.abs(series - np.mean(series))
+
+        # Calculate a mask for the differences that are > 3 standard deviations from zero
+        this_mask = absolute_differences_from_mean > (np.std(series) * 2.5)
+
+        # Replace these values with the previous one across the data
+        for i in series[this_mask].index.to_list():
+            series[i] = series[i - 1]
+
+        return series
+
     def rolling(n_since=100, roll=roll):
 
         # transform to rolling average
@@ -200,8 +214,10 @@ def CovidPlots():
             dF = dF.rolling(roll).mean()
             # for each column in a DF, get rows >= n_since and reset index
             since = [pd.DataFrame(dF[i][dF[i] >= n_since].reset_index(drop=True)) for i in top_countries]
-            # concatenate the columns
-            sets_grouped_daily_top_rolled.append(pd.concat(since, axis=1, join='outer'))
+            # concatenate the columns and remove outliers
+            out = pd.concat(since, axis=1, join='outer').apply(replace_outliers)
+            # append
+            sets_grouped_daily_top_rolled.append(out)
 
         return sets_grouped_daily_top_rolled
 
