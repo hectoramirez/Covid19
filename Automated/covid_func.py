@@ -193,15 +193,15 @@ def CovidPlots():
         absolute_differences_from_mean = np.abs(series - np.mean(series))
 
         # Calculate a mask for the differences that are > 3 standard deviations from zero
-        this_mask = absolute_differences_from_mean > (np.std(series) * 2.5)
+        this_mask = absolute_differences_from_mean > (np.std(series) * 2.4)
 
-        # Replace these values with the previous one across the data
+        # Replace these values with the median accross the data
         for i in series[this_mask].index.to_list():
-            series[i] = series[i - 1]
+            series[i] = series[i - 1] - np.mean([series[i - j] - series[i - (j - 1)] for j in reversed(range(2, 8))])
 
         return series
 
-    def rolling(n_since=100, roll=roll):
+    def rolling(n_since=100, roll=roll, quit_outliers=False):
 
         # transform to rolling average
         dFs = daily()
@@ -215,7 +215,10 @@ def CovidPlots():
             # for each column in a DF, get rows >= n_since and reset index
             since = [pd.DataFrame(dF[i][dF[i] >= n_since].reset_index(drop=True)) for i in top_countries]
             # concatenate the columns and remove outliers
-            out = pd.concat(since, axis=1, join='outer').apply(replace_outliers)
+            if quit_outliers:
+                out = pd.concat(since, axis=1, join='outer').apply(replace_outliers)
+            else:
+                out = pd.concat(since, axis=1, join='outer')
             # append
             sets_grouped_daily_top_rolled.append(out)
 
@@ -273,11 +276,11 @@ def CovidPlots():
 
     # Remember: rolling() throws a list of dataframes where {'confirmed': 0, 'deaths': 1, 'confirmed':2}
 
-    yticks = [200, 500, 1000, 2000, 5000, 10000, 20000]
+    yticks = [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000]
     bokeh_plot(rolling()[0], 'confirmed', n_since=100, tickers=yticks)
 
-    yticks = [5, 10, 20, 50, 100, 200, 500, 1000, 2000]
-    bokeh_plot(rolling(n_since=3)[1], 'deaths', n_since=3, tickers=yticks)
+    yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 3000]
+    bokeh_plot(rolling(n_since=3, quit_outliers=True)[1], 'deaths', n_since=3, tickers=yticks)
 
     # =========================================================================================  geo visualizations
 
