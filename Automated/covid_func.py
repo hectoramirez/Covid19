@@ -37,17 +37,17 @@ def CovidPlots():
     sets = [world_confirmed, world_deaths, world_recovered]
 
     # yesterday's date
-    yesterday = world_confirmed.columns[-1]
+    yesterday = pd.to_datetime(world_confirmed.columns[-1]).date()
     today_date = str(pd.to_datetime(yesterday).date() + datetime.timedelta(days=1))
     # print('\nAccording to the latest imput, the data was updated on ' + today_date + '.')
 
     # =========================================================================================  clean
 
-    def dropDP(dF):
+    def dropDP(df):
         # Drop the Diamond Princess entry
-        DP = dF['Province/State'] == 'Diamond Princess'
-        dF.drop(dF[DP].index, inplace=True)
-        return dF.reset_index()
+        DP = df['Province/State'] == 'Diamond Princess'
+        df.drop(df[DP].index, inplace=True)
+        return df.reset_index(drop=True)
 
     sets = [dropDP(i) for i in sets]
 
@@ -55,13 +55,14 @@ def CovidPlots():
         sets[i].rename(columns={'Country/Region': 'Country', 'Province/State': 'State'}, inplace=True)
         sets[i][['State']] = sets[i][['State']].fillna('')
         sets[i].fillna(0, inplace=True)
+        # Change dates to datetime format
+        sets[i].columns = sets[i].columns[:4].tolist() + [pd.to_datetime(sets[i].columns[j]).date()
+                                                          for j in range(4, len(sets[i].columns))]
 
     sets_grouped = []
     cases = ['confirmed cases', 'deaths', 'recovered cases']
     for i in range(3):
         sets_grouped.append(sets[i].groupby('Country').sum())
-        # print('\nTop countries by {}:\n'.format(cases[i]))
-        # print(sets_grouped[i][yesterday].sort_values(ascending=False).head(5))
 
     # =========================================================================================  top countries
 
@@ -73,16 +74,18 @@ def CovidPlots():
         from bokeh.io import output_file, show, output_notebook, save
         from bokeh.plotting import figure
         from bokeh.models import ColumnDataSource, HoverTool
-        from bokeh.palettes import Spectral6
+        from bokeh.palettes import Viridis as palette
         from bokeh.transform import factor_cmap
 
         df = dataF.iloc[:, -1].sort_values(ascending=False).head(20).to_frame()
         df['totals'] = df.iloc[:, -1]
+        df.drop(df.columns[0], axis=1, inplace=True)
 
         # get continent names
         import country_converter as coco
         continent = coco.convert(names=df.index.to_list(), to='Continent')
         df['Continent'] = continent
+        cont_cat = len(df['Continent'].unique())
 
         source = ColumnDataSource(df)
 
@@ -97,9 +100,9 @@ def CovidPlots():
                    title="Top Countries with {} as of ".format(case) + today_date,
                    tools=select_tools)
 
-        p.vbar(x='Country', top='totals', width=0.9, alpha=0.5, source=source,
+        p.vbar(x='Country', top='totals', width=0.9, alpha=0.7, source=source,
                legend_field="Continent",
-               fill_color=factor_cmap('Continent', palette=Spectral6, factors=df.Continent))
+               color=factor_cmap('Continent', palette=palette[cont_cat], factors=df.Continent.unique()))
 
         p.xgrid.grid_line_color = None
         p.y_range.start = 0
@@ -122,7 +125,7 @@ def CovidPlots():
         from bokeh.io import output_file, show, output_notebook, save
         from bokeh.plotting import figure
         from bokeh.models import ColumnDataSource, HoverTool
-        from bokeh.palettes import Spectral10
+        from bokeh.palettes import Viridis as palette
         from bokeh.transform import factor_cmap
 
         # top countries by deaths rate with at least num deaths
@@ -131,16 +134,18 @@ def CovidPlots():
 
         # Inner join to the confirmed set, compute mortality rate and take top 20
         df_mort = pd.concat([sets_grouped[0][yesterday], top_death], axis=1, join='inner')
-        df_mort['top_mort'] = round(df_mort.iloc[:, 1] / df_mort.iloc[:, 0] * 100, 2)
-        mort_rate = df_mort['top_mort'].sort_values(ascending=False).to_frame().head(20)
+        mort_rate = round(df_mort.iloc[:, 1] / df_mort.iloc[:, 0] * 100, 2)
+        mort_rate = mort_rate.sort_values(ascending=False).to_frame().head(20)
 
         # take yesterday's data
         df = mort_rate.iloc[:, -1].sort_values(ascending=False).head(20).to_frame()
         df['totals'] = df.iloc[:, -1]
+        df.drop(df.columns[0], axis=1, inplace=True)
 
         import country_converter as coco
         continent = coco.convert(names=df.index.to_list(), to='Continent')
         df['Continent'] = continent
+        cont_cat = len(df['Continent'].unique())
 
         source = ColumnDataSource(df)
 
@@ -156,9 +161,9 @@ def CovidPlots():
                          "as of ".format(num) + today_date,
                    tools=select_tools)
 
-        p.vbar(x='Country', top='totals', width=0.9, alpha=0.5, source=source,
+        p.vbar(x='Country', top='totals', width=0.9, alpha=0.7, source=source,
                legend_field="Continent",
-               fill_color=factor_cmap('Continent', palette=Spectral10, factors=df.Continent))
+               fill_color=factor_cmap('Continent', palette=palette[cont_cat], factors=df.Continent.unique()))
 
         p.xgrid.grid_line_color = None
         p.y_range.start = 0
@@ -192,12 +197,24 @@ def CovidPlots():
         # Calculate the absolute difference of each timepoint from the series mean
         absolute_differences_from_mean = np.abs(series - np.mean(series))
 
-        # Calculate a mask for the differences that are > 3 standard deviations from zero
-        this_mask = absolute_differences_from_mean > (np.std(series) * 2.4)
+        # Calculate a mask for the differences that are > 5 standard deviations from zero
+        this_mask = absolute_differences_from_mean > (np.std(series) * 5)
 
-        # Replace these values with the median accross the data
-        for i in series[this_mask].index.to_list():
-            series[i] = series[i - 1] - np.mean([series[i - j] - series[i - (j - 1)] for j in reversed(range(2, 8))])
+        # If the trend is rising, replace values with the previous value plus the mean of the previous
+        # 7 differences
+        # If the trend is falling off, replace values with the previous value minus the mean of the previous
+        # 7 differences
+        for date in series[this_mask].index.to_list():
+            if series[date - datetime.timedelta(days=2)] - series[date - datetime.timedelta(days=0)] < 0:
+                series[date] = np.abs(series[date + datetime.timedelta(days=-1)] +
+                                      np.mean([series[date - datetime.timedelta(days=j)] -
+                                               series[date - datetime.timedelta(days=j - 1)]
+                                               for j in reversed(range(2, 8))]))
+            else:
+                series[date] = np.abs(series[date + datetime.timedelta(days=-1)] -
+                                      np.mean([series[date - datetime.timedelta(days=j)] -
+                                               series[date - datetime.timedelta(days=j - 1)]
+                                               for j in reversed(range(2, 8))]))
 
         return series
 
@@ -208,7 +225,7 @@ def CovidPlots():
 
         sets_grouped_daily_top_rolled = []
         for i in range(3):  # Transform each dataset at a time
-            dF = dFs[i]
+            dF = dFs[i].apply(replace_outliers)
             top_countries = dF.columns
             # get the rolling mean
             dF = dF.rolling(roll).mean()
@@ -277,16 +294,16 @@ def CovidPlots():
     # Remember: rolling() throws a list of dataframes where {'confirmed': 0, 'deaths': 1, 'confirmed':2}
 
     yticks = [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000]
-    bokeh_plot(rolling()[0], 'confirmed', n_since=100, tickers=yticks)
+    bokeh_plot(rolling(n_since=30)[0], 'confirmed', n_since=30, tickers=yticks)
 
     yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 3000]
-    bokeh_plot(rolling(n_since=3, quit_outliers=True)[1], 'deaths', n_since=3, tickers=yticks)
+    bokeh_plot(rolling(n_since=3)[1], 'deaths', n_since=3, tickers=yticks)
 
     # =========================================================================================  geo visualizations
 
     fig = px.scatter_geo(sets[0],
-                         lat="Lat", lon="Long", color=yesterday,
-                         hover_name="Country", size=yesterday,
+                         lat="Lat", lon="Long", color=sets[0][yesterday].tolist(),
+                         hover_name="Country", size=sets[0][yesterday].tolist(),
                          size_max=40,
                          template='plotly', projection="natural earth",
                          title="COVID-19 worldwide confirmed cases")
@@ -294,8 +311,8 @@ def CovidPlots():
     plty.offline.plot(fig, filename='Geo_confirmed.html', auto_open=False)
 
     fig = px.scatter_geo(sets[1],
-                         lat="Lat", lon="Long", color=yesterday,
-                         hover_name="Country", size=yesterday,
+                         lat="Lat", lon="Long", color=sets[1][yesterday].tolist(),
+                         hover_name="Country", size=sets[1][yesterday].tolist(),
                          size_max=40,
                          template='plotly', projection="natural earth",
                          title="COVID-19 worldwide deaths")
