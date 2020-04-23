@@ -44,9 +44,11 @@ def CovidPlots():
     # =========================================================================================  clean
 
     def dropDP(df):
-        # Drop the Diamond Princess entry
-        DP = df['Province/State'] == 'Diamond Princess'
-        df.drop(df[DP].index, inplace=True)
+        # Drop the Diamond and Grand Princess entries
+        dp = df['Province/State'] == 'Diamond Princess'
+        gp = df['Province/State'] == 'Grand Princess'
+        df.drop(df[dp].index, inplace=True)
+        df.drop(df[gp].index, inplace=True)
         return df.reset_index(drop=True)
 
     sets = [dropDP(i) for i in sets]
