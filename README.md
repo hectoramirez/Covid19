@@ -11,7 +11,7 @@ Set of charts automatically updated daily with [Apache Airflow](https://airflow.
 [![Medium](https://img.shields.io/badge/Medium-Story-informational)](https://medium.com/p/your-live-covid-19-tracker-with-airflow-and-github-pages-658c3e048304?source=email-2e35a42940fd--writer.postDistributed&sk=343b8c88e348ff738b1f947c38076c97)
 [![TDS](https://img.shields.io/badge/-Towards%20Data%20Science-blue)](https://towardsdatascience.com/your-live-covid-19-tracker-with-airflow-and-github-pages-658c3e048304)
 
-![Illustration of photon/dark photon passage through inhomogeneities.](plots/gif.gif)
+![Daily deaths GIF](plots/gif.gif)
 
 We use the [bokeh](https://bokeh.org) and [plotly](https://plotly.com) visualization libraries.
 
