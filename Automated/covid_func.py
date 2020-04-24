@@ -43,15 +43,14 @@ def CovidPlots():
 
     # =========================================================================================  clean
 
-    def dropDP(df):
-        # Drop the Diamond and Grand Princess entries
-        dp = df['Province/State'] == 'Diamond Princess'
-        gp = df['Province/State'] == 'Grand Princess'
-        df.drop(df[dp].index, inplace=True)
-        df.drop(df[gp].index, inplace=True)
+    def drop_neg(df):
+        # Drop negative entries entries
+        idx_l = df[df.iloc[:, -1] < 0].index.tolist()
+        for i in idx_l:
+            df.drop([i], inplace=True)
         return df.reset_index(drop=True)
 
-    sets = [dropDP(i) for i in sets]
+    sets = [drop_neg(i) for i in sets]
 
     for i in range(3):
         sets[i].rename(columns={'Country/Region': 'Country', 'Province/State': 'State'}, inplace=True)
@@ -295,7 +294,7 @@ def CovidPlots():
 
     # Remember: rolling() throws a list of dataframes where {'confirmed': 0, 'deaths': 1, 'confirmed':2}
 
-    yticks = [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000]
+    yticks = [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000]
     bokeh_plot(rolling(n_since=30)[0], 'confirmed', n_since=30, tickers=yticks)
 
     yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 3000]
@@ -303,21 +302,50 @@ def CovidPlots():
 
     # =========================================================================================  geo visualizations
 
-    fig = px.scatter_geo(sets[0],
-                         lat="Lat", lon="Long", color=sets[0][yesterday].tolist(),
-                         hover_name="Country", size=sets[0][yesterday].tolist(),
-                         size_max=40,
-                         template='plotly', projection="natural earth",
-                         title="COVID-19 worldwide confirmed cases")
+    sets_daily = []
+    for i in range(3):
+        df_1 = sets[i].iloc[:, 4:].diff(axis=1)
+        df_2 = sets[i].iloc[:, :4]
+        df_final = pd.concat([df_2, df_1], axis=1).reset_index()
+        df_final = drop_neg(df_final)
+        df_final.columns = df_final.columns.map(str)
+        sets_daily.append(df_final)
+
+    fig = px.scatter_geo(sets_daily[0],
+                         lat="Lat", lon="Long", color=str(yesterday),
+                         hover_name="Country", size=str(yesterday),
+                         size_max=40, hover_data=["State"],
+                         template='seaborn', projection="natural earth",
+                         title="COVID-19 new worldwide confirmed cases")
+
+    fig.update_geos(
+        resolution=110,
+        # showcoastlines=True, coastlinecolor="RebeccaPurple",
+        # showland=True, landcolor="LightGreen",
+        # showocean=True, oceancolor="LightBlue",
+        showcountries=True
+        # showlakes=True, lakecolor="Blue",
+        # showrivers=True, rivercolor="Blue"
+    )
 
     plty.offline.plot(fig, filename='Geo_confirmed.html', auto_open=False)
 
-    fig = px.scatter_geo(sets[1],
-                         lat="Lat", lon="Long", color=sets[1][yesterday].tolist(),
-                         hover_name="Country", size=sets[1][yesterday].tolist(),
-                         size_max=40,
-                         template='plotly', projection="natural earth",
-                         title="COVID-19 worldwide deaths")
+    fig = px.scatter_geo(sets_daily[1],
+                         lat="Lat", lon="Long", color=str(yesterday),
+                         hover_name="State", size=str(yesterday),
+                         size_max=40, hover_data=["Country"],
+                         template='seaborn', projection="natural earth",
+                         title="COVID-19 new worldwide deaths")
+
+    fig.update_geos(
+        resolution=110,
+        # showcoastlines=True, coastlinecolor="RebeccaPurple",
+        # showland=True, landcolor="LightGreen",
+        # showocean=True, oceancolor="LightBlue",
+        showcountries=True
+        # showlakes=True, lakecolor="Blue",
+        # showrivers=True, rivercolor="Blue"
+    )
 
     plty.offline.plot(fig, filename='Geo_deaths.html', auto_open=False)
 
