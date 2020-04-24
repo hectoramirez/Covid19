@@ -5,5 +5,5 @@ matplotlib==3.1.2
 plotly-express==0.4.1
 plotly==4.6.0
 seaborn
-bokeh=2.0.1
+bokeh==2.0.1
 country-converter
