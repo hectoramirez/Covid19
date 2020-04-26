@@ -302,19 +302,46 @@ def CovidPlots():
 
     # =========================================================================================  geo visualizations
 
+    # Construct a data set with daily cases acounting for Lat and Lon without States
     sets_daily = []
     for i in range(3):
-        df_1 = sets[i].iloc[:, 4:].diff(axis=1)
-        df_2 = sets[i].iloc[:, :4]
-        df_final = pd.concat([df_2, df_1], axis=1).reset_index()
+        # Countries to to take care of
+        c_to_change = sets[0][sets[0].State != ''].Country.unique().tolist()
+        # Get Lat and Lon of Australia's, Canada's and Hubei's capitals
+        mask_1 = (sets[i].State == 'Australian Capital Territory') | (sets[i].State == 'Ontario') | (
+                    sets[i].State == 'Hubei')
+        # Get Lat and Lon for Denmark, France, Netherlands and UK
+        mask_2 = (sets[0].Country == 'Denmark') | (sets[0].Country == 'France') | (sets[0].Country == 'Netherlands') | (
+                    sets[0].Country == 'United Kingdom')
+        # Lat and Lon of countries to take care of
+        c_lat_lon_1 = sets[i][mask_2][sets[i][mask_2].State == ''].loc[:, ['Country', 'Lat', 'Long']].set_index(
+            'Country')
+        c_lat_lon_2 = sets[i][mask_1].loc[:, ['Country', 'Lat', 'Long']].set_index('Country')
+        c_lat_lon = pd.concat([c_lat_lon_1, c_lat_lon_2])
+        # Records for the countries
+        c_records = sets_grouped[i].loc[c_to_change].drop(['Lat', 'Long'], axis=1)
+        # Full DF of countries to take care of
+        full = pd.concat([c_lat_lon, c_records], axis=1)
+        # Sets grouped without the countries
+        df_no_c = sets_grouped[i].drop(c_to_change)
+        # Concat with the full countries DF
+        df_final = pd.concat([df_no_c, full]).reset_index().rename(columns={'index': 'Country'})
+        # Get daily records
+        df_1 = df_final.iloc[:, 3:].diff(axis=1)
+        df_2 = df_final.iloc[:, :3]
+        df_final = pd.concat([df_2, df_1], axis=1)
+        # Drop negative values
         df_final = drop_neg(df_final)
+        # Change date-time name columns by string names
         df_final.columns = df_final.columns.map(str)
+        df_final = df_final.rename(columns={str(yesterday): str(today_date)})
+        #
         sets_daily.append(df_final)
 
     fig = px.scatter_geo(sets_daily[0],
-                         lat="Lat", lon="Long", color=str(yesterday),
-                         hover_name="Country", size=str(yesterday),
-                         size_max=40, hover_data=["State"],
+                         lat="Lat", lon="Long", color=str(today_date),
+                         hover_name="Country", size=str(today_date),
+                         size_max=40,  # hover_data=["State"],
                          template='seaborn', projection="natural earth",
                          title="COVID-19 new worldwide confirmed cases")
 
@@ -331,9 +358,9 @@ def CovidPlots():
     plty.offline.plot(fig, filename='Geo_confirmed.html', auto_open=False)
 
     fig = px.scatter_geo(sets_daily[1],
-                         lat="Lat", lon="Long", color=str(yesterday),
-                         hover_name="State", size=str(yesterday),
-                         size_max=40, hover_data=["Country"],
+                         lat="Lat", lon="Long", color=str(today_date),
+                         hover_name="Country", size=str(today_date),
+                         size_max=40,  # hover_data=["Country"],
                          template='seaborn', projection="natural earth",
                          title="COVID-19 new worldwide deaths")
 
