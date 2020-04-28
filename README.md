@@ -32,4 +32,4 @@ Series of scripts used for Airflow:
     * <b>covid_func.py</b> Reproduces the code in the Jupyter notebook.
     * <b>git_push.py</b> Commit/push of the plots to the GitHub Pages repository.
     
-The tracker is updated daily at 01:00 UTC.
+The tracker is updated daily at 05:00 UTC.
