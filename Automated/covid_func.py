@@ -187,12 +187,9 @@ def CovidPlots():
     roll = 7
 
     def daily(n_top=10):
-
         # compute daily values for the n_top countries
-        sets_grouped_daily = [df.sort_values(by=yesterday, ascending=False).iloc[:n_top, 2:].diff(axis=1).T
-                              for df in sets_grouped]
-
-        return sets_grouped_daily
+        return [df.sort_values(by=yesterday, ascending=False).iloc[:n_top, 2:].diff(axis=1).T
+                for df in sets_grouped]
 
     def replace_outliers(series):
         # Calculate the absolute difference of each timepoint from the series mean
@@ -229,20 +226,25 @@ def CovidPlots():
             dF = dFs[i].apply(replace_outliers)
             top_countries = dF.columns
             # get the rolling mean
-            dF = dF.rolling(roll).mean()
-            # for each column in a DF, get rows >= n_since and reset index
-            since = [pd.DataFrame(dF[i][dF[i] >= n_since].reset_index(drop=True)) for i in top_countries]
+            dF = dF.rolling(roll).mean().reset_index(drop=True)
+            # for each column in a DF, get indexes where rows >= n_since
+            since = [pd.DataFrame(dF[i][dF[i] >= n_since]).index[0] for i in top_countries]
+            # restart dataframes starting from since and reset index
+            dfs = [dF.iloc[since[i]:, i].reset_index(drop=True) for i in range(len(dF.columns))]
             # concatenate the columns and remove outliers
             if quit_outliers:
-                out = pd.concat(since, axis=1, join='outer').apply(replace_outliers)
+                out = pd.concat(dfs, axis=1, join='outer').reset_index(drop=True).apply(replace_outliers)
             else:
-                out = pd.concat(since, axis=1, join='outer')
+                out = pd.concat(dfs, axis=1, join='outer').reset_index(drop=True)
+            # change values < 1 by 0.5
+            out[out < 0.5] = 0.5
+
             # append
             sets_grouped_daily_top_rolled.append(out)
 
         return sets_grouped_daily_top_rolled
 
-    def bokeh_plot(dataF, cat, n_since, tickers, n_top=10):
+    def bokeh_plot(dataF, cat, n_since, tickers, n_top=10, format_axes=False):
 
         ''' Customizations for the Bokeh plots '''
         # cat = {'confirmed', 'deaths', 'recoveries'}
@@ -253,7 +255,7 @@ def CovidPlots():
 
         from bokeh.io import output_notebook, output_file, show, reset_output
         from bokeh.plotting import figure, save
-        from bokeh.models import ColumnDataSource, NumeralTickFormatter, HoverTool
+        from bokeh.models import ColumnDataSource, NumeralTickFormatter, HoverTool, Span
         from bokeh.palettes import Category20
 
         # Specify the selection tools to be made available
@@ -266,21 +268,30 @@ def CovidPlots():
             ('{}'.format(cat), '$y{(0)}')
         ]
 
-        p = figure(y_axis_type="log", plot_width=840, plot_height=600,
+        if format_axes:
+            y_range = [0.49, 4000]
+        else:
+            y_range = None
+
+        p = figure(y_range=y_range,
+                   y_axis_type="log", plot_width=840, plot_height=600,
                    x_axis_label='Days since average daily {} passed {}'.format(cat, n_since),
                    y_axis_label='',
                    title=
                    'Daily {} ({}-day rolling average) by number of days ' \
                    'since {} cases - top {} countries ' \
                    '(as of {})'.format(cat, roll, n_since, n_top, today_date),
-                   toolbar_location='right', tools=select_tools)
+                   toolbar_location='above',tools=select_tools, toolbar_sticky=False)
 
         for i in range(n_top):
             p.line(dataF.index[:], dataF.iloc[:, i], line_width=2, color=Category20[20][i], alpha=0.8,
                    legend_label=dataF.columns[i], name=dataF.columns[i])
+            p.line(1)
             p.circle(dataF.index[:], dataF.iloc[:, i], color=Category20[20][i], fill_color='white',
                      size=3, alpha=0.8, legend_label=dataF.columns[i], name=dataF.columns[i])
+            hline = Span(location=1, dimension='width', line_width=2, line_dash='dashed', line_color='gray')
 
+        p.renderers.extend([hline])
         p.yaxis.ticker = tickers
 
         p.legend.location = 'top_right'
@@ -298,7 +309,7 @@ def CovidPlots():
     bokeh_plot(rolling(n_since=30)[0], 'confirmed', n_since=30, tickers=yticks)
 
     yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 3000]
-    bokeh_plot(rolling(n_since=3)[1], 'deaths', n_since=3, tickers=yticks)
+    bokeh_plot(rolling(n_since=3)[1], 'deaths', n_since=3, tickers=yticks, format_axes=True)
 
     # =========================================================================================  geo visualizations
 
@@ -334,13 +345,13 @@ def CovidPlots():
         df_final = drop_neg(df_final)
         # Change date-time name columns by string names
         df_final.columns = df_final.columns.map(str)
-        df_final = df_final.rename(columns={str(yesterday): str(today_date)})
+        df_final = df_final.rename(columns={str(yesterday): 'New cases'})
         #
         sets_daily.append(df_final)
 
     fig = px.scatter_geo(sets_daily[0],
-                         lat="Lat", lon="Long", color=str(today_date),
-                         hover_name="Country", size=str(today_date),
+                         lat="Lat", lon="Long", color='New cases',
+                         hover_name="Country", size='New cases',
                          size_max=40,  # hover_data=["State"],
                          template='seaborn', projection="natural earth",
                          title="COVID-19 new worldwide confirmed cases")
@@ -358,8 +369,8 @@ def CovidPlots():
     plty.offline.plot(fig, filename='Geo_confirmed.html', auto_open=False)
 
     fig = px.scatter_geo(sets_daily[1],
-                         lat="Lat", lon="Long", color=str(today_date),
-                         hover_name="Country", size=str(today_date),
+                         lat="Lat", lon="Long", color='New cases',
+                         hover_name="Country", size='New cases',
                          size_max=40,  # hover_data=["Country"],
                          template='seaborn', projection="natural earth",
                          title="COVID-19 new worldwide deaths")

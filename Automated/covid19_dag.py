@@ -6,14 +6,14 @@ import datetime as dt
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': dt.datetime(2020, 4, 1, 1, 00, 00),
+    'start_date': dt.datetime(2020, 4, 1, 5, 00, 00),
     'retries': 1
 }
 
 dag = DAG('covid',
           default_args=default_args,
           catchup=False,
-          schedule_interval='0 1 * * *'
+          schedule_interval='0 5 * * *'
           )
 
 t1 = BashOperator(
