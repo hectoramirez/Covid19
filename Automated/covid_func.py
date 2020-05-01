@@ -186,10 +186,18 @@ def CovidPlots():
 
     roll = 7
 
-    def daily(n_top=10):
+    def daily(n_top=15):
         # compute daily values for the n_top countries
-        return [df.sort_values(by=yesterday, ascending=False).iloc[:n_top, 2:].diff(axis=1).T
-                for df in sets_grouped]
+        dfs = [df.sort_values(by=yesterday, ascending=False).iloc[:n_top, 2:].diff(axis=1).T
+               for df in sets_grouped]
+
+        # replace negative values by the previous day value
+        for df in dfs:
+            for i in df.columns:
+                idx = df.loc[df[i] < 0, i].index
+                df.loc[idx, i] = df.loc[idx - datetime.timedelta(days=1), i].tolist()
+
+        return dfs
 
     def replace_outliers(series):
         # Calculate the absolute difference of each timepoint from the series mean
@@ -244,7 +252,7 @@ def CovidPlots():
 
         return sets_grouped_daily_top_rolled
 
-    def bokeh_plot(dataF, cat, n_since, tickers, n_top=10, format_axes=False):
+    def bokeh_plot(dataF, cat, n_since, tickers, n_top=12, format_axes=False):
 
         ''' Customizations for the Bokeh plots '''
         # cat = {'confirmed', 'deaths', 'recoveries'}
