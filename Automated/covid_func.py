@@ -63,7 +63,9 @@ def CovidPlots():
     sets_grouped = []
     cases = ['confirmed cases', 'deaths', 'recovered cases']
     for i in range(3):
-        sets_grouped.append(sets[i].groupby('Country').sum())
+        o = sets[i].groupby('Country').sum()
+        o.rename(index={'US': 'United States'}, inplace=True)
+        sets_grouped.append(o)
 
     # =========================================================================================  top countries
 
