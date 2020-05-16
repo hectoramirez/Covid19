@@ -254,7 +254,7 @@ def CovidPlots():
 
         return sets_grouped_daily_top_rolled
 
-    def bokeh_plot(dataF, cat, n_since, tickers, n_top=12, format_axes=False):
+    def bokeh_plot(dataF, cat, n_since, tickers, n_top=15, format_axes=False):
 
         ''' Customizations for the Bokeh plots '''
         # cat = {'confirmed', 'deaths', 'recoveries'}
