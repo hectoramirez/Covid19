@@ -364,7 +364,7 @@ def CovidPlots():
                          hover_name="Country", size='New cases',
                          size_max=40,  # hover_data=["State"],
                          template='seaborn', projection="natural earth",
-                         title="COVID-19 new worldwide confirmed cases")
+                         title="COVID-19 new worldwide confirmed cases as of " + today_date)
 
     fig.update_geos(
         resolution=110,
@@ -383,7 +383,7 @@ def CovidPlots():
                          hover_name="Country", size='New cases',
                          size_max=40,  # hover_data=["Country"],
                          template='seaborn', projection="natural earth",
-                         title="COVID-19 new worldwide deaths")
+                         title="COVID-19 new worldwide deaths as of " + today_date)
 
     fig.update_geos(
         resolution=110,
