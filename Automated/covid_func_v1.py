@@ -67,12 +67,6 @@ def CovidPlots():
         o.rename(index={'US': 'United States'}, inplace=True)
         sets_grouped.append(o)
 
-    # get continent names
-    import country_converter as coco
-    for df in sets_grouped:
-        continent = coco.convert(names=df.index.tolist(), to='Continent')
-        df['Continent'] = continent
-
     # =========================================================================================  top countries
 
     def bokehB(dataF, case):
@@ -86,12 +80,16 @@ def CovidPlots():
         from bokeh.palettes import Viridis as palette
         from bokeh.transform import factor_cmap
 
-        df = dataF.iloc[:, -2:].sort_values(by=dataF.columns[-2], ascending=False).head(20)
-        df['totals'] = df.iloc[:, 0]
+        df = dataF.iloc[:, -1].sort_values(ascending=False).head(20).to_frame()
+        df['totals'] = df.iloc[:, -1]
         df.drop(df.columns[0], axis=1, inplace=True)
+
+        # get continent names
+        import country_converter as coco
+        continent = coco.convert(names=df.index.to_list(), to='Continent')
+        df['Continent'] = continent
         cont_cat = len(df['Continent'].unique())
 
-        # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         source = ColumnDataSource(df)
 
         select_tools = ['save']
@@ -119,16 +117,6 @@ def CovidPlots():
         output_file('top_{}.html'.format(case))
 
         return save(p, 'top_{}.html'.format(case))
-
-    '''
-    # pandas plots
-    mortality_rate = sets_grouped[1] / sets_grouped[0] * 100
-    top_mortality = mortality_rate[yesterday].sort_values(ascending=False).head(20)
-    plt.figure(dpi=200)
-    top_mortality.plot.bar(title="Top Countries' mortality rate as of " +  yesterday_date, figsize=(15,10), rot=45)
-    plt.savefig('plots/top_mortality.png')
-    plt.show()
-    '''
 
     def bokehB_mort(num=100):
 
@@ -200,36 +188,10 @@ def CovidPlots():
 
     roll = 7
 
-    def daily():
-
-        # Classify countries into continents
-        countries = sets_grouped[0].index.tolist()
-        continents = coco.convert(names=countries, to='Continent')
-        df_cont = pd.DataFrame({'coun': countries, 'cont': continents})
-        America = df_cont[df_cont.cont == 'America'].coun.tolist()
-        Asia = df_cont[df_cont.cont == 'Asia'].coun.tolist()
-        Europe = df_cont[df_cont.cont == 'Europe'].coun.tolist()
-        Africa = df_cont[df_cont.cont == 'Africa'].coun.tolist()
-        Oceania = df_cont[df_cont.cont == 'Oceania'].coun.tolist()
-
-        bycontinent_conf = []
-        for continent in [America, Asia, Europe, Africa, Oceania]:
-            df_cat = sets_grouped[0].loc[continent]
-            bycontinent_conf.append(df_cat)
-
-        bycontinent_death = []
-        for continent in [America, Asia, Europe, Africa, Oceania]:
-            df_cat = sets_grouped[1].loc[continent]
-            bycontinent_death.append(df_cat)
-
+    def daily(n_top=15):
         # compute daily values for the n_top countries
-        dfs_conf = [df.sort_values(by=yesterday, ascending=False).iloc[:, 2:-1].diff(axis=1).T
-                    for df in bycontinent_conf]
-
-        dfs_death = [df.sort_values(by=yesterday, ascending=False).iloc[:, 2:-1].diff(axis=1).T
-                     for df in bycontinent_death]
-
-        dfs = dfs_conf + dfs_death
+        dfs = [df.sort_values(by=yesterday, ascending=False).iloc[:n_top, 2:].diff(axis=1).T
+               for df in sets_grouped]
 
         # replace negative values by the previous day value
         for df in dfs:
@@ -264,30 +226,35 @@ def CovidPlots():
 
         return series
 
-    def rolling(dfs, n_since=30, roll=roll):
+    def rolling(n_since=100, roll=roll, quit_outliers=False):
 
         # transform to rolling average
-        daily_rolled = []
-        for i in range(len(dfs)):  # Transform each dataset at a time
-            dF = dfs[i].apply(replace_outliers)
+        dFs = daily()
+
+        sets_grouped_daily_top_rolled = []
+        for i in range(3):  # Transform each dataset at a time
+            dF = dFs[i].apply(replace_outliers)
+            top_countries = dF.columns
             # get the rolling mean
             dF = dF.rolling(roll).mean().reset_index(drop=True)
             # for each column in a DF, get indexes where rows >= n_since
-            since = [pd.DataFrame(dF[j][dF[j] >= n_since]).index for j in dF.columns]
-            since = [(k, since[k][0]) for k in range(len(since)) if len(since[k]) > 0]
+            since = [pd.DataFrame(dF[i][dF[i] >= n_since]).index[0] for i in top_countries]
             # restart dataframes starting from since and reset index
-            dfs_ = [dF.iloc[since[i][1]:, since[i][0]].reset_index(drop=True) for i in range(len(since))]
+            dfs = [dF.iloc[since[i]:, i].reset_index(drop=True) for i in range(len(dF.columns))]
             # concatenate the columns and remove outliers
-            if len(dfs_) != 0:
-                out = pd.concat(dfs_, axis=1, join='outer').reset_index(drop=True)
-                # change values < 1 by 0.5
-                out[out < 0.5] = 0.5
-                # append
-                daily_rolled.append(out)
+            if quit_outliers:
+                out = pd.concat(dfs, axis=1, join='outer').reset_index(drop=True).apply(replace_outliers)
+            else:
+                out = pd.concat(dfs, axis=1, join='outer').reset_index(drop=True)
+            # change values < 1 by 0.5
+            out[out < 0.5] = 0.5
 
-        return daily_rolled
+            # append
+            sets_grouped_daily_top_rolled.append(out)
 
-    def bokeh_plot(dataF, cat, n_since, tickers, cont, format_axes=False):
+        return sets_grouped_daily_top_rolled
+
+    def bokeh_plot(dataF, cat, n_since, tickers, n_top=15, format_axes=False):
 
         ''' Customizations for the Bokeh plots '''
         # cat = {'confirmed', 'deaths', 'recoveries'}
@@ -317,32 +284,22 @@ def CovidPlots():
             y_range = None
 
         p = figure(y_range=y_range,
-                   x_range=[-2, 130],
                    y_axis_type="log", plot_width=840, plot_height=600,
                    x_axis_label='Days since average daily {} passed {}'.format(cat, n_since),
                    y_axis_label='',
                    title=
                    'Daily {} ({}-day rolling average) by number of days ' \
-                   'since {} cases - top countries ' \
-                   '(as of {})'.format(cat, roll, n_since, today_date),
-                   toolbar_location='above', tools=select_tools, toolbar_sticky=False)
+                   'since {} cases - top {} countries ' \
+                   '(as of {})'.format(cat, roll, n_since, n_top, today_date),
+                   toolbar_location='above',tools=select_tools, toolbar_sticky=False)
 
-        if len(dataF.columns) > 10:
-            count = 10
-        else:
-            count = len(dataF.columns)
-
-        for i in range(count):
+        for i in range(n_top):
             p.line(dataF.index[:], dataF.iloc[:, i], line_width=2, color=Category20[20][i], alpha=0.8,
                    legend_label=dataF.columns[i], name=dataF.columns[i])
             p.line(1)
             p.circle(dataF.index[:], dataF.iloc[:, i], color=Category20[20][i], fill_color='white',
                      size=3, alpha=0.8, legend_label=dataF.columns[i], name=dataF.columns[i])
-            hline = Span(location=1, dimension='width', line_width=2.5, line_dash='dashed', line_color='gray')
-
-        for i in range(len(dataF.columns)):
-            p.line(dataF.index[:], dataF.iloc[:, i], line_width=2, alpha=0.2, color='gray',
-                   name=dataF.columns[i])
+            hline = Span(location=1, dimension='width', line_width=2, line_dash='dashed', line_color='gray')
 
         p.renderers.extend([hline])
         p.yaxis.ticker = tickers
@@ -352,21 +309,17 @@ def CovidPlots():
 
         p.add_tools(HoverTool(tooltips=tooltips))
 
-        output_file('Daily_{}_{}.html'.format(cat, cont))
+        output_file('Daily_{}.html'.format(cat))
 
-        return save(p, 'Daily_{}_{}.html'.format(cat, cont))
+        return save(p, 'Daily_{}.html'.format(cat))
 
-    daily_rolled_conf = rolling(daily()[:5])
-    daily_rolled_death = rolling(daily()[5:], n_since=3)
+    # Remember: rolling() throws a list of dataframes where {'confirmed': 0, 'deaths': 1, 'confirmed':2}
 
-    cont_str = ['America', 'Asia', 'Europe', 'Africa', 'Oceania']
-    for i, df in enumerate(daily_rolled_conf):
-        yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000]
-        bokeh_plot(df, 'confirmed', n_since=30, tickers=yticks, cont=cont_str[i])
+    yticks = [2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000]
+    bokeh_plot(rolling(n_since=30)[0], 'confirmed', n_since=30, tickers=yticks)
 
-    for i, df in enumerate(daily_rolled_death):
-        yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 3000]
-        bokeh_plot(df, 'deaths', n_since=3, tickers=yticks, cont=cont_str[i], format_axes=True)
+    yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 3000]
+    bokeh_plot(rolling(n_since=3)[1], 'deaths', n_since=3, tickers=yticks, format_axes=True)
 
     # =========================================================================================  geo visualizations
 
