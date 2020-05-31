@@ -211,6 +211,7 @@ def CovidPlots():
         Europe = df_cont[df_cont.cont == 'Europe'].coun.tolist()
         Africa = df_cont[df_cont.cont == 'Africa'].coun.tolist()
         Oceania = df_cont[df_cont.cont == 'Oceania'].coun.tolist()
+        America.remove('Ecuador')
 
         bycontinent_conf = []
         for continent in [America, Asia, Europe, Africa, Oceania]:
@@ -299,7 +300,7 @@ def CovidPlots():
         from bokeh.io import output_notebook, output_file, show, reset_output
         from bokeh.plotting import figure, save
         from bokeh.models import ColumnDataSource, NumeralTickFormatter, HoverTool, Span
-        from bokeh.palettes import Category20
+        from bokeh.palettes import Category10
 
         # Specify the selection tools to be made available
         select_tools = ['box_zoom', 'pan', 'wheel_zoom', 'reset', 'crosshair', 'save']
@@ -333,14 +334,14 @@ def CovidPlots():
             count = len(dataF.columns)
 
         for i in range(count):
-            p.line(dataF.index[:], dataF.iloc[:, i], line_width=2, color=Category20[20][i], alpha=0.8,
+            p.line(dataF.index[:], dataF.iloc[:, i], line_width=2.5, color=Category10[10][i], alpha=0.8,
                    legend_label=dataF.columns[i], name=dataF.columns[i])
             p.line(1)
-            p.circle(dataF.index[:], dataF.iloc[:, i], color=Category20[20][i], fill_color='white',
+            p.circle(dataF.index[:], dataF.iloc[:, i], color=Category10[10][i], fill_color='white',
                      size=3, alpha=0.8, legend_label=dataF.columns[i], name=dataF.columns[i])
             hline = Span(location=1, dimension='width', line_width=2.5, line_dash='dashed', line_color='gray')
 
-        for i in range(len(dataF.columns)):
+        for i in range(count, len(dataF.columns)):
             p.line(dataF.index[:], dataF.iloc[:, i], line_width=2, alpha=0.2, color='gray',
                    name=dataF.columns[i])
 
