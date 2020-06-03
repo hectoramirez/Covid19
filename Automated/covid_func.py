@@ -1,5 +1,4 @@
 def CovidPlots():
-
     # Function to reproduce the interactive plots from:
     # https://hectoramirez.github.io/covid/COVID19.html
     # The code is explained in:
@@ -39,6 +38,7 @@ def CovidPlots():
     # yesterday's date
     yesterday = pd.to_datetime(world_confirmed.columns[-1]).date()
     today_date = str(pd.to_datetime(yesterday).date() + datetime.timedelta(days=1))
+
     # print('\nAccording to the latest imput, the data was updated on ' + today_date + '.')
 
     # =========================================================================================  clean
@@ -378,10 +378,10 @@ def CovidPlots():
         c_to_change = sets[0][sets[0].State != ''].Country.unique().tolist()
         # Get Lat and Lon of Australia's, Canada's and Hubei's capitals
         mask_1 = (sets[i].State == 'Australian Capital Territory') | (sets[i].State == 'Ontario') | (
-                    sets[i].State == 'Hubei')
+                sets[i].State == 'Hubei')
         # Get Lat and Lon for Denmark, France, Netherlands and UK
         mask_2 = (sets[0].Country == 'Denmark') | (sets[0].Country == 'France') | (sets[0].Country == 'Netherlands') | (
-                    sets[0].Country == 'United Kingdom')
+                sets[0].Country == 'United Kingdom')
         # Lat and Lon of countries to take care of
         c_lat_lon_1 = sets[i][mask_2][sets[i][mask_2].State == ''].loc[:, ['Country', 'Lat', 'Long']].set_index(
             'Country')
@@ -404,7 +404,16 @@ def CovidPlots():
         # Change date-time name columns by string names
         df_final.columns = df_final.columns.map(str)
         df_final = df_final.rename(columns={str(yesterday): 'New cases'})
+
         #
+        def drop_neg(df):
+            # Drop negative entries entries
+            idx_l = df[df.iloc[:, -2] < 0].index.tolist()
+            for i in idx_l:
+                df.drop([i], inplace=True)
+            return df.reset_index(drop=True)
+
+        drop_neg(df_final)
         sets_daily.append(df_final)
 
     fig = px.scatter_geo(sets_daily[0],
