@@ -245,7 +245,7 @@ def CovidPlots():
         absolute_differences_from_mean = np.abs(series - np.mean(series))
 
         # Calculate a mask for the differences that are > 5 standard deviations from zero
-        this_mask = absolute_differences_from_mean > (np.std(series) * 5)
+        this_mask = absolute_differences_from_mean > (np.std(series) * 3)
 
         # If the trend is rising, replace values with the previous value plus the mean of the previous
         # 7 differences
@@ -366,7 +366,9 @@ def CovidPlots():
         return save(p, 'Daily_{}_{}.html'.format(cat, cont))
 
     daily_rolled_conf = rolling(daily()[:5])
-    daily_rolled_death = rolling(daily()[5:], n_since=3)
+    Europe = [df.apply(replace_outliers) for df in daily()[7:8]]
+    daily_rolled_death = rolling(daily()[5:7] + Europe + daily()[8:], n_since=3)
+    # daily_rolled_death = rolling(daily()[5:], n_since=3)
 
     cont_str = ['America', 'Asia', 'Europe', 'Africa', 'Oceania']
     for i, df in enumerate(daily_rolled_conf):
