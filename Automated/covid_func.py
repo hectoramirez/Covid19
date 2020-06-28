@@ -433,15 +433,12 @@ def CovidPlots():
                          template='seaborn', projection="natural earth",
                          title="COVID-19 new worldwide confirmed cases as of " + today_date)
 
-    fig.update_geos(
-        resolution=110,
-        # showcoastlines=True, coastlinecolor="RebeccaPurple",
-        # showland=True, landcolor="LightGreen",
-        # showocean=True, oceancolor="LightBlue",
-        showcountries=True
-        # showlakes=True, lakecolor="Blue",
-        # showrivers=True, rivercolor="Blue"
-    )
+    fig.update_layout(
+    geo=dict(showframe=False, showcoastlines=False, 
+             projection_type='equirectangular'))
+
+    fig.update_geos(resolution=110, showcountries=True, 
+                lataxis_range=[-55, 90], lonaxis_range=[-180, 180])
 
     plty.offline.plot(fig, filename='Geo_confirmed.html', auto_open=False)
 
@@ -452,15 +449,12 @@ def CovidPlots():
                          template='seaborn', projection="natural earth",
                          title="COVID-19 new worldwide deaths as of " + today_date)
 
-    fig.update_geos(
-        resolution=110,
-        # showcoastlines=True, coastlinecolor="RebeccaPurple",
-        # showland=True, landcolor="LightGreen",
-        # showocean=True, oceancolor="LightBlue",
-        showcountries=True
-        # showlakes=True, lakecolor="Blue",
-        # showrivers=True, rivercolor="Blue"
-    )
+    fig.update_layout(
+    geo=dict(showframe=False, showcoastlines=False, 
+             projection_type='equirectangular'))
+
+    fig.update_geos(resolution=110, showcountries=True, 
+                lataxis_range=[-55, 90], lonaxis_range=[-180, 180])
 
     plty.offline.plot(fig, filename='Geo_deaths.html', auto_open=False)
 
