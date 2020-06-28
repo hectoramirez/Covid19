@@ -434,7 +434,7 @@ def CovidPlots():
                          title="COVID-19 new worldwide confirmed cases as of " + today_date)
 
     fig.update_layout(
-    geo=dict(showframe=False, showcoastlines=False, 
+    geo=dict(showframe=True, showcoastlines=False, 
              projection_type='equirectangular'))
 
     fig.update_geos(resolution=110, showcountries=True, 
@@ -450,7 +450,7 @@ def CovidPlots():
                          title="COVID-19 new worldwide deaths as of " + today_date)
 
     fig.update_layout(
-    geo=dict(showframe=False, showcoastlines=False, 
+    geo=dict(showframe=True, showcoastlines=False, 
              projection_type='equirectangular'))
 
     fig.update_geos(resolution=110, showcountries=True, 
