@@ -326,7 +326,7 @@ def CovidPlots():
         #
 
         p = figure(y_range=y_range,
-                   x_range=[-2, 150],
+                   x_range=[-2, 170],
                    y_axis_type="log", plot_width=840, plot_height=600,
                    x_axis_label='Days since average daily {} passed {}'.format(cat, n_since),
                    y_axis_label='',
