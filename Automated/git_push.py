@@ -10,7 +10,7 @@ os.chdir('/home/ec2-user/hectoramirez.github.io/covid')
 
 #PATH_OF_GIT_REPO = r'/Users/hramirez/GitHub/hectoramirez.github.io/.git'  # make sure .git folder is properly configured
 PATH_OF_GIT_REPO = r'/home/ec2-user/hectoramirez.github.io/.git'  # make sure .git folder is properly configured
-COMMIT_MESSAGE = 'daily update'
+COMMIT_MESSAGE = 'daily update'.encode(encoding='UTF-8',errors='strict')
 
 
 def git_push():
