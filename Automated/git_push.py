@@ -3,7 +3,7 @@ import os
 import sys  
 
 #reload(sys)  
-sys.setdefaultencoding('utf8')
+#sys.setdefaultencoding('utf8')
 
 # os.chdir('/Users/hramirez/GitHub/hectoramirez.github.io/covid')
 os.chdir('/home/ec2-user/hectoramirez.github.io/covid')
