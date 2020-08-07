@@ -2,7 +2,7 @@ from git import Repo
 import os
 import sys  
 
-reload(sys)  
+#reload(sys)  
 sys.setdefaultencoding('utf8')
 
 # os.chdir('/Users/hramirez/GitHub/hectoramirez.github.io/covid')
