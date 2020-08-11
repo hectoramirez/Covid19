@@ -5,7 +5,7 @@ import os
 
 os.chdir('/home/ec2-user/hectoramirez.github.io/covid')
 
-PATH_OF_GIT_REPO = r'/home/ec2-user/hectoramirez.github.io/.git'  # make sure .git folder is properly configured
+PATH_OF_GIT_REPO = r'/home/ec2-user/hectoramirez.github.io/.git'
 
 def git_push():
 
