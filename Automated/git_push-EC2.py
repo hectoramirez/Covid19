@@ -1,9 +1,5 @@
 from git import Repo
 import os
-import sys  
-
-#reload(sys)  
-#sys.setdefaultencoding('utf8')
 
 os.chdir('/home/ec2-user/hectoramirez.github.io/covid')
 
