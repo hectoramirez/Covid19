@@ -7,12 +7,12 @@ import sys
 
 from git import Repo
 
-sys.setdefaultencoding("utf-8")
+# sys.setdefaultencoding("utf-8")
 # sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
 
 os.chdir('/home/ec2-user/hectoramirez.github.io/covid')
 
-PATH_OF_GIT_REPO = r'/home/ec2-user/hectoramirez.github.io/.git'
+PATH_OF_GIT_REPO = '/home/ec2-user/hectoramirez.github.io/.git'
 
 def git_push():
 
