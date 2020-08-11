@@ -1,4 +1,5 @@
-# encoding: utf-8
+# -*- coding: utf-8 -*-
+
 
 import codecs
 import os
@@ -6,7 +7,8 @@ import sys
 
 from git import Repo
 
-sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
+sys.setdefaultencoding("utf-8")
+# sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
 
 os.chdir('/home/ec2-user/hectoramirez.github.io/covid')
 
