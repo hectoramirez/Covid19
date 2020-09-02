@@ -22,7 +22,7 @@ def CovidPlots():
     sns.set_style(custom_style)
 
     os.chdir('/Users/hramirez/GitHub/Covid19/Automated')
-    #os.chdir('/home/ec2-user/Covid19/Automated')
+    # os.chdir('/home/ec2-user/Covid19/Automated')
 
     # =========================================================================================  import
 
@@ -199,7 +199,7 @@ def CovidPlots():
 
     # =========================================================================================  daily cases
 
-    roll = 10
+    roll = 14
 
     def daily():
 
@@ -314,16 +314,16 @@ def CovidPlots():
         ]
 
         #
-        num = dataF.iloc[:,0].sort_values(ascending=False).values[0]
+        num = dataF.iloc[:, 0].sort_values(ascending=False).values[0]
         s = str(int(num))[0]
         l = len(str(int(num)))
-        a = str(int(s)+2) + '0'*(l-1)
+        a = str(int(s) + 2) + '0' * (l - 1)
         a = int(a)
 
         if format_axes:
-            y_range=[0.49, a]
-        else: 
-            y_range=None
+            y_range = [0.49, a]
+        else:
+            y_range = None
         #
 
         p = figure(y_range=y_range,
@@ -435,11 +435,11 @@ def CovidPlots():
                          title="COVID-19 new worldwide confirmed cases as of " + today_date)
 
     fig.update_layout(
-    geo=dict(showframe=True, showcoastlines=False, 
-             projection_type='equirectangular'))
+        geo=dict(showframe=True, showcoastlines=False,
+                 projection_type='equirectangular'))
 
-    fig.update_geos(resolution=110, showcountries=True, 
-                lataxis_range=[-55, 90], lonaxis_range=[-180, 180])
+    fig.update_geos(resolution=110, showcountries=True,
+                    lataxis_range=[-55, 90], lonaxis_range=[-180, 180])
 
     plty.offline.plot(fig, filename='Geo_confirmed.html', auto_open=False)
 
@@ -451,11 +451,11 @@ def CovidPlots():
                          title="COVID-19 new worldwide deaths as of " + today_date)
 
     fig.update_layout(
-    geo=dict(showframe=True, showcoastlines=False, 
-             projection_type='equirectangular'))
+        geo=dict(showframe=True, showcoastlines=False,
+                 projection_type='equirectangular'))
 
-    fig.update_geos(resolution=110, showcountries=True, 
-                lataxis_range=[-55, 90], lonaxis_range=[-180, 180])
+    fig.update_geos(resolution=110, showcountries=True,
+                    lataxis_range=[-55, 90], lonaxis_range=[-180, 180])
 
     plty.offline.plot(fig, filename='Geo_deaths.html', auto_open=False)
 
