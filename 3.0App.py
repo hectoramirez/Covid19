@@ -433,7 +433,7 @@ st.sidebar.markdown("Select below whether you want to see yesterday's numbers, t
                     "numbers, or the top countries by case:")
 sections = ('World new cases', 'Historical trends', 'Top countries')
 selection = st.sidebar.radio('', sections)
-st.sidebar.markdown('__Tip__: click on enter full screen when hovering over an image!')
+st.sidebar.markdown('__Pro tip__: click on Menu Settings -> Show app in wide mode -> Save')
 st.sidebar.markdown('---')
 st.sidebar.markdown('### [Source Code](https://github.com/hectoramirez/Covid19)')
 st.sidebar.markdown(
