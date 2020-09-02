@@ -15,12 +15,12 @@ from bokeh.palettes import Viridis as palette
 from bokeh.transform import factor_cmap
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 
-
 # ======================================================================== Load and Cache the data
-@st.cache(persist=True)
+#@st.cache(persist=True)
 def getdata():
     WORLD_CONFIRMED_URL = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
     WORLD_DEATHS_URL = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'
@@ -35,10 +35,12 @@ def getdata():
     # yesterday's date
     yesterday = pd.to_datetime(world_confirmed.columns[-1]).date()
     today_date = str(pd.to_datetime(yesterday).date() + datetime.timedelta(days=1))
-    
-    return(yesterday, today_date, sets)
+
+    return (yesterday, today_date, sets)
+
 
 yesterday, today_date, sets = getdata()[0], getdata()[1], getdata()[2]
+
 
 # =========================================================================================  clean
 
@@ -48,6 +50,7 @@ def drop_neg(df):
     for i in idx_l:
         df.drop([i], inplace=True)
     return df.reset_index(drop=True)
+
 
 sets = [drop_neg(i) for i in sets]
 
@@ -70,11 +73,11 @@ for i in range(3):
 for df in sets_grouped:
     continent = coco.convert(names=df.index.tolist(), to='Continent')
     df['Continent'] = continent
-    
+
+
 # =========================================================================================  top countries
 
 def bokehB(dataF, case):
-
     # Bokeh bar plots. The function takes a dataframe, datF, as the one provided by the raw data
     # (dates as columns, countries as rows). It first takes the last column as yesterday's date.
 
@@ -110,8 +113,8 @@ def bokehB(dataF, case):
 
     return p
 
-def bokehB_mort(num=100):
 
+def bokehB_mort(num=100):
     # Bokeh bar plots. The function already includes the confirmed and deaths dataframes,
     # and operates over them to calculate th mortality rate depending on num (number of
     # minimum deaths to consider for a country). The rest is equivalent to the BokehB()
@@ -162,12 +165,13 @@ def bokehB_mort(num=100):
 
     return p
 
+
 # =========================================================================================  daily cases
 
 roll = 15
 
-def daily():
 
+def daily():
     # Classify countries into continents
     countries = sets_grouped[0].index.tolist()
     continents = coco.convert(names=countries, to='Continent')
@@ -206,6 +210,7 @@ def daily():
 
     return dfs
 
+
 def replace_outliers(series):
     # Calculate the absolute difference of each timepoint from the series mean
     absolute_differences_from_mean = np.abs(series - np.mean(series))
@@ -233,7 +238,6 @@ def replace_outliers(series):
 
 
 def rolling(dfs, n_since=30, roll=roll):
-
     # transform to rolling average
     daily_rolled = []
     for i in range(len(dfs)):  # Transform each dataset at a time
@@ -257,7 +261,6 @@ def rolling(dfs, n_since=30, roll=roll):
 
 
 def bokeh_plot(dataF, cat, n_since, tickers, cont, format_axes=False):
-
     ''' Customizations for the Bokeh plots '''
     # cat = {'confirmed', 'deaths', 'recoveries'}
     # n_since = number of cases since we start counting
@@ -281,16 +284,16 @@ def bokeh_plot(dataF, cat, n_since, tickers, cont, format_axes=False):
     ]
 
     #
-    num = dataF.iloc[:,0].sort_values(ascending=False).values[0]
+    num = dataF.iloc[:, 0].sort_values(ascending=False).values[0]
     s = str(int(num))[0]
     l = len(str(int(num)))
-    a = str(int(s)+2) + '0'*(l-1)
+    a = str(int(s) + 2) + '0' * (l - 1)
     a = int(a)
 
     if format_axes:
-        y_range=[0.49, a]
-    else: 
-        y_range=None
+        y_range = [0.49, a]
+    else:
+        y_range = None
     #
 
     p = figure(y_range=y_range,
@@ -330,6 +333,7 @@ def bokeh_plot(dataF, cat, n_since, tickers, cont, format_axes=False):
 
     return p
 
+
 # =========================================================================================  geo visualizations
 
 # Construct a data set with daily cases acounting for Lat and Lon without States
@@ -366,6 +370,7 @@ for i in range(3):
     df_final.columns = df_final.columns.map(str)
     df_final = df_final.rename(columns={str(yesterday): 'New cases'})
 
+
     #
     def drop_neg(df):
         # Drop negative entries entries
@@ -374,15 +379,16 @@ for i in range(3):
             df.drop([i], inplace=True)
         return df.reset_index(drop=True)
 
+
     drop_neg(df_final)
     sets_daily.append(df_final)
 
-fig1 = px.scatter_geo(sets_daily[0], #width=840, height=600,
-                     lat="Lat", lon="Long", color='New cases',
-                     hover_name="Country", size='New cases',
-                     size_max=40,  # hover_data=["State"],
-                     template='seaborn', projection="natural earth")
-                     #title="New worldwide confirmed cases")
+fig1 = px.scatter_geo(sets_daily[0], width=1200, height=500,
+                      lat="Lat", lon="Long", color='New cases',
+                      hover_name="Country", size='New cases',
+                      size_max=40,  # hover_data=["State"],
+                      template='seaborn', projection="natural earth")
+# title="New worldwide confirmed cases")
 
 fig1.update_layout(
     geo=dict(showframe=True, showcoastlines=False, projection_type='equirectangular'),
@@ -390,16 +396,16 @@ fig1.update_layout(
 )
 fig1.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, pad=0))
 
-fig1.update_geos(resolution=110, showcountries=True)#, 
+fig1.update_geos(resolution=110, showcountries=True)  # ,
 #    lataxis_range=[-55, 90], lonaxis_range=[-180, 180])
 
 
-fig2 = px.scatter_geo(sets_daily[1], #width=840, height=600,
-                     lat="Lat", lon="Long", color='New cases',
-                     hover_name="Country", size='New cases',
-                     size_max=40,  # hover_data=["Country"],
-                     template='seaborn', projection="natural earth")
-                     #title="New worldwide deaths")
+fig2 = px.scatter_geo(sets_daily[1], width=1200, height=500,
+                      lat="Lat", lon="Long", color='New cases',
+                      hover_name="Country", size='New cases',
+                      size_max=40,  # hover_data=["Country"],
+                      template='seaborn', projection="natural earth")
+# title="New worldwide deaths")
 
 fig2.update_layout(
     geo=dict(showframe=True, showcoastlines=False, projection_type='equirectangular'),
@@ -407,7 +413,7 @@ fig2.update_layout(
 )
 fig2.update_layout(autosize=True, margin=dict(l=0, r=0, b=0, pad=0))
 
-fig2.update_geos(resolution=110, showcountries=True)#, 
+fig2.update_geos(resolution=110, showcountries=True)  # ,
 #    lataxis_range=[-55, 90], lonaxis_range=[-180, 180])
 
 
@@ -423,52 +429,55 @@ st.sidebar.markdown('# Covid-19 tracker')
 st.sidebar.markdown('#FlattenTheCurve #StayHome')
 st.sidebar.markdown('### Latest update: {}'.format(today_date))
 st.sidebar.markdown('---')
-st.sidebar.markdown("Select below whether you want to see yesterday's numbers, the historical "\
-                   "numbers, or the top countries by case:")
+st.sidebar.markdown("Select below whether you want to see yesterday's numbers, the historical " \
+                    "numbers, or the top countries by case:")
 sections = ('World new cases', 'Historical trends', 'Top countries')
 selection = st.sidebar.radio('', sections)
 st.sidebar.markdown('__Tip__: click on enter full screen when hovering over an image!')
 st.sidebar.markdown('---')
 st.sidebar.markdown('### [Source Code](https://github.com/hectoramirez/Covid19)')
-st.sidebar.markdown('### [Medium Story](https://towardsdatascience.com/your-live-covid-19-tracker-with-airflow-and-github-pages-658c3e048304)')
+st.sidebar.markdown(
+    '### [Medium Story](https://towardsdatascience.com/your-live-covid-19-tracker-with-airflow-and-github-pages-658c3e048304)')
 st.sidebar.markdown('### [Contact](https://www.linkedin.com/in/harr/)')
-    
 
 # ======================================================================== Main
-container=True
+container = True
+
 
 def footer():
     st.markdown('---')
     st.markdown('## Data source:')
-    st.markdown('We use the live COVID19 data from the [GitHub data repository](https://github.com/CSSEGISandData/COVID-19) '\
-                'for the 2019 Novel Coronavirus Visual Dashboard by the Johns '\
-                'Hopkins University Center for Systems Science and Engineering '\
-                '(JHU CSSE).')
+    st.markdown(
+        'We use the live COVID19 data from the [GitHub data repository](https://github.com/CSSEGISandData/COVID-19) ' \
+        'for the 2019 Novel Coronavirus Visual Dashboard by the Johns ' \
+        'Hopkins University Center for Systems Science and Engineering ' \
+        '(JHU CSSE).')
     st.markdown('## Notes:')
-    st.markdown('On April 17th, [_China outbreak city Wuhan raised death toll by '\
-                '50%_](https://www.bbc.com/news/world-asia-china-52321529) (BBC). '\
-                'As a consequence, outliers of this type were removed '\
-                '― values whose distance from the mean is larger than 5σ are replaced '\
-                'by the previous-day value plus/minus the mean of the previous 7-day '\
+    st.markdown('On April 17th, [_China outbreak city Wuhan raised death toll by ' \
+                '50%_](https://www.bbc.com/news/world-asia-china-52321529) (BBC). ' \
+                'As a consequence, outliers of this type were removed ' \
+                '― values whose distance from the mean is larger than 5σ are replaced ' \
+                'by the previous-day value plus/minus the mean of the previous 7-day ' \
                 'direct differences depending on whether the trend is rising/falling off.')
+
 
 if selection == sections[0]:
     st.markdown('# World new cases')
     st.markdown('---')
-    
-    opt = {'New worldwide confirmed cases':fig1, 'New worldwide deaths':fig2}
-    
+
+    opt = {'New worldwide confirmed cases': fig1, 'New worldwide deaths': fig2}
+
     case = st.selectbox('Select option:', ('New worldwide confirmed cases', 'New worldwide deaths'))
-    st.plotly_chart(opt[case], use_container_width=False)#container)
-    
+    st.plotly_chart(opt[case], use_container_width=True)  # container)
+
     footer()
 
 elif selection == sections[1]:
     st.markdown('# Historical trends')
     st.markdown('---')
-    
+
     opt = ('Confirmed cases', 'Deaths')
-    
+
     daily_rolled_conf = rolling(daily()[:5])
     Europe = [df.apply(replace_outliers) for df in daily()[7:8]]
     daily_rolled_death = rolling(daily()[5:7] + Europe + daily()[8:], n_since=3)
@@ -476,64 +485,63 @@ elif selection == sections[1]:
 
     case = st.selectbox('Select option:', opt)
     cont_str = ('Europe', 'America', 'Asia', 'Africa', 'Oceania')
-    
-#    yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000]
-    
-#    if case == 'Confirmed cases':
-#       optcont = {'Europe':bokeh_plot(daily_rolled_conf[2], 'confirmed', n_since=30, tickers=yticks, cont=cont_str[2], format_axes=True),
-#                 'America':bokeh_plot(daily_rolled_conf[0], 'confirmed', n_since=30, tickers=yticks, cont=cont_str[0], format_axes=True),
-#               'Asia':bokeh_plot(daily_rolled_conf[1], 'confirmed', n_since=30, tickers=yticks, cont=cont_str[1], format_axes=True),
-#               'Africa':bokeh_plot(daily_rolled_conf[3], 'confirmed', n_since=30, tickers=yticks, cont=cont_str[3], format_axes=True), 
-#              'Oceania':bokeh_plot(daily_rolled_conf[4], 'confirmed', n_since=30, tickers=yticks, cont=cont_str[4], format_axes=True)}
-#  case = st.selectbox('', cont_str)
-# st.bokeh_chart(optcont[case], use_container_width=container)
-        
-   # if case == 'Deaths':
+
+    #    yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000]
+
+    #    if case == 'Confirmed cases':
+    #       optcont = {'Europe':bokeh_plot(daily_rolled_conf[2], 'confirmed', n_since=30, tickers=yticks, cont=cont_str[2], format_axes=True),
+    #                 'America':bokeh_plot(daily_rolled_conf[0], 'confirmed', n_since=30, tickers=yticks, cont=cont_str[0], format_axes=True),
+    #               'Asia':bokeh_plot(daily_rolled_conf[1], 'confirmed', n_since=30, tickers=yticks, cont=cont_str[1], format_axes=True),
+    #               'Africa':bokeh_plot(daily_rolled_conf[3], 'confirmed', n_since=30, tickers=yticks, cont=cont_str[3], format_axes=True),
+    #              'Oceania':bokeh_plot(daily_rolled_conf[4], 'confirmed', n_since=30, tickers=yticks, cont=cont_str[4], format_axes=True)}
+    #  case = st.selectbox('', cont_str)
+    # st.bokeh_chart(optcont[case], use_container_width=container)
+
+    # if case == 'Deaths':
     #    optcont = {'Europe':bokeh_plot(daily_rolled_death[2], 'deaths', n_since=3, tickers=yticks, cont=cont_str[2], format_axes=True),
-     #              'America':bokeh_plot(daily_rolled_death[0], 'deaths', n_since=3, tickers=yticks, cont=cont_str[0], format_axes=True),
-      #            'Asia':bokeh_plot(daily_rolled_death[1], 'deaths', n_since=3, tickers=yticks, cont=cont_str[1], format_axes=True),
-       #            'Africa':bokeh_plot(daily_rolled_death[3], 'deaths', n_since=3, tickers=yticks, cont=cont_str[3], format_axes=True), 
-        #           'Oceania':bokeh_plot(daily_rolled_death[4], 'deaths', n_since=3, tickers=yticks, cont=cont_str[4], format_axes=True)}
-        #yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000]
-        #case = st.selectbox('', cont_str)
-        #st.bokeh_chart(optcont[case], use_container_width=container)
-    
-    
+    #              'America':bokeh_plot(daily_rolled_death[0], 'deaths', n_since=3, tickers=yticks, cont=cont_str[0], format_axes=True),
+    #            'Asia':bokeh_plot(daily_rolled_death[1], 'deaths', n_since=3, tickers=yticks, cont=cont_str[1], format_axes=True),
+    #            'Africa':bokeh_plot(daily_rolled_death[3], 'deaths', n_since=3, tickers=yticks, cont=cont_str[3], format_axes=True),
+    #           'Oceania':bokeh_plot(daily_rolled_death[4], 'deaths', n_since=3, tickers=yticks, cont=cont_str[4], format_axes=True)}
+    # yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000]
+    # case = st.selectbox('', cont_str)
+    # st.bokeh_chart(optcont[case], use_container_width=container)
+
     if case == 'Confirmed cases':
         for i, df in enumerate(daily_rolled_conf):
             yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000]
             st.markdown('## {}'.format(cont_str[i]))
             st.bokeh_chart(
-                bokeh_plot(df, 'confirmed', n_since=30, tickers=yticks, cont=cont_str[i], format_axes=True), 
+                bokeh_plot(df, 'confirmed', n_since=30, tickers=yticks, cont=cont_str[i], format_axes=True),
                 use_container_width=container)
-    
+
     elif case == 'Deaths':
         for i, df in enumerate(daily_rolled_death):
             yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 3000]
             st.markdown('## {}'.format(cont_str[i]))
             st.bokeh_chart(
-                bokeh_plot(df, 'deaths', n_since=3, tickers=yticks, cont=cont_str[i], format_axes=True), 
+                bokeh_plot(df, 'deaths', n_since=3, tickers=yticks, cont=cont_str[i], format_axes=True),
                 use_container_width=container)
-            
+
     footer()
-    
+
 elif selection == sections[2]:
-#    opt = {'Confirmed':bokehB(sets_grouped[0], cases[0]), 
-#           'Deaths':bokehB(sets_grouped[1], cases[1]), 
-#           'Recoveries':bokehB(sets_grouped[2], cases[2]), 
-#           'Mortality rate':bokehB_mort(100)}
-    
-#    case = st.selectbox('', ('Confirmed', 'Deaths', 'Recoveries', 'Mortality rate'))
-#    st.bokeh_chart(opt[case], use_container_width=container)
-    
+    #    opt = {'Confirmed':bokehB(sets_grouped[0], cases[0]),
+    #           'Deaths':bokehB(sets_grouped[1], cases[1]),
+    #           'Recoveries':bokehB(sets_grouped[2], cases[2]),
+    #           'Mortality rate':bokehB_mort(100)}
+
+    #    case = st.selectbox('', ('Confirmed', 'Deaths', 'Recoveries', 'Mortality rate'))
+    #    st.bokeh_chart(opt[case], use_container_width=container)
+
     st.markdown('# Top countries')
     st.markdown('---')
-    
+
     cases2 = ('Confirmed', 'Deaths', 'Recoveries', 'Mortality rate')
     for i in range(3):
         st.markdown('## {}'.format(cases2[i]))
         st.bokeh_chart(bokehB(sets_grouped[i], cases[i]), use_container_width=container)
     st.markdown('## {}'.format(cases2[-1]))
     st.bokeh_chart(bokehB_mort(100), use_container_width=container)
-    
+
     footer()
