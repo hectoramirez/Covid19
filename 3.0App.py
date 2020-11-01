@@ -297,7 +297,7 @@ def bokeh_plot(dataF, cat, n_since, tickers, cont, format_axes=False):
     #
 
     p = figure(y_range=y_range,
-               x_range=[-2, 240],
+               x_range=[-2, 340],
                y_axis_type="log", plot_width=840, plot_height=600,
                x_axis_label='Days since average daily {} passed {}'.format(cat, n_since),
                y_axis_label='',
@@ -509,7 +509,7 @@ elif selection == sections[1]:
 
     if case == 'Confirmed cases':
         for i, df in enumerate(daily_rolled_conf):
-            yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 30000]
+            yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000]
             st.markdown('## {}'.format(cont_str[i]))
             st.bokeh_chart(
                 bokeh_plot(df, 'confirmed', n_since=30, tickers=yticks, cont=cont_str[i], format_axes=True),
@@ -517,7 +517,7 @@ elif selection == sections[1]:
 
     elif case == 'Deaths':
         for i, df in enumerate(daily_rolled_death):
-            yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 3000]
+            yticks = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000]
             st.markdown('## {}'.format(cont_str[i]))
             st.bokeh_chart(
                 bokeh_plot(df, 'deaths', n_since=3, tickers=yticks, cont=cont_str[i], format_axes=True),
