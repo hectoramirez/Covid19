@@ -1,8 +1,20 @@
 # Live COVID-19 tracker with Airflow
 
+> **Note:** The app is no longer live and maintained. To run it locally you may clone the
+> repository, install all requirements in `requirements.txt`, and do
+> ```
+> streamlit run 3.0App.py
+> ```
+> 
+> The final live app looked like in the following screenshot:
+> 
+> ![Daily deaths GIF](plots/last_screenshot.png)
+
+---
+
 Set of charts automatically updated daily with [Apache Airflow](https://airflow.apache.org). COVID-19 data provided by the Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE). The data can be found in [this GitHub data repository](https://github.com/CSSEGISandData/COVID-19).
 
-* __[Link](https://hectoramirez.github.io/covid/COVID19.html) to the live tracker__
+* __[~~Link~~]() to the live tracker__
 
 * __A [Medium Story](https://medium.com/p/your-live-covid-19-tracker-with-airflow-and-github-pages-658c3e048304?source=email-2e35a42940fd--writer.postDistributed&sk=343b8c88e348ff738b1f947c38076c97) of this project was featured in the _Data Science_ and _Programming_ topic pages, and was  published in [Towards Data Science](https://towardsdatascience.com)__
 
