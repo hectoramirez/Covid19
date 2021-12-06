@@ -1,4 +1,5 @@
 
+.DS_Store
 .idea/
 .ipynb_checkpoints/
 /.ipynb_checkpoints/*
@@ -8,6 +9,7 @@ Automated/*.html
 untitled folder/
 
 example_LiveCOVID19_data.ipynb
+COVID19_notebook.ipynb
 COVID19_notebook-Copy1.ipynb
 COVID19_notebook-Copy2.ipynb
 rCOVID19_notebook-Copy1.ipynb
