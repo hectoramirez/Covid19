@@ -20,7 +20,7 @@ warnings.filterwarnings("ignore")
 
 
 # ======================================================================== Load and Cache the data
-#@st.cache(persist=True)
+# @st.cache(persist=True)
 def getdata():
     WORLD_CONFIRMED_URL = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
     WORLD_DEATHS_URL = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'
@@ -429,15 +429,16 @@ st.sidebar.markdown('# Covid-19 tracker')
 st.sidebar.markdown('#FlattenTheCurve #StayHome')
 st.sidebar.markdown('### Latest update: {}'.format(today_date))
 st.sidebar.markdown('---')
-st.sidebar.markdown("Select below whether you want to see yesterday's numbers, the historical " \
-                    "numbers, or the top countries by case:")
+st.sidebar.markdown("Select below whether you want to see yesterday's numbers, the historical ""numbers, or the top "
+                    "countries by case:")
 sections = ('World new cases', 'Historical trends', 'Top countries')
 selection = st.sidebar.radio('', sections)
 st.sidebar.markdown('__Pro tip__: click on Menu Settings -> Show app in wide mode -> Save')
 st.sidebar.markdown('---')
 st.sidebar.markdown('### [Source Code](https://github.com/hectoramirez/Covid19)')
 st.sidebar.markdown(
-    '### [Medium Story](https://towardsdatascience.com/your-live-covid-19-tracker-with-airflow-and-github-pages-658c3e048304)')
+    '### [Medium Story](https://towardsdatascience.com/your-live-covid-19-tracker-with-airflow-and-github-pages'
+    '-658c3e048304)')
 st.sidebar.markdown('### [Contact](https://www.linkedin.com/in/harr/)')
 
 # ======================================================================== Main
@@ -448,16 +449,16 @@ def footer():
     st.markdown('---')
     st.markdown('## Data source:')
     st.markdown(
-        'We use the live COVID19 data from the [GitHub data repository](https://github.com/CSSEGISandData/COVID-19) ' \
-        'for the 2019 Novel Coronavirus Visual Dashboard by the Johns ' \
-        'Hopkins University Center for Systems Science and Engineering ' \
+        'We use the live COVID19 data from the [GitHub data repository](https://github.com/CSSEGISandData/COVID-19) '
+        'for the 2019 Novel Coronavirus Visual Dashboard by the Johns '
+        'Hopkins University Center for Systems Science and Engineering '
         '(JHU CSSE).')
     st.markdown('## Notes:')
-    st.markdown('On April 17th, [_China outbreak city Wuhan raised death toll by ' \
-                '50%_](https://www.bbc.com/news/world-asia-china-52321529) (BBC). ' \
-                'As a consequence, outliers of this type were removed ' \
-                '― values whose distance from the mean is larger than 5σ are replaced ' \
-                'by the previous-day value plus/minus the mean of the previous 7-day ' \
+    st.markdown('On April 17th, [_China outbreak city Wuhan raised death toll by '
+                '50%_](https://www.bbc.com/news/world-asia-china-52321529) (BBC). '
+                'As a consequence, outliers of this type were removed '
+                '― values whose distance from the mean is larger than 5σ are replaced '
+                'by the previous-day value plus/minus the mean of the previous 7-day '
                 'direct differences depending on whether the trend is rising/falling off.')
 
 
