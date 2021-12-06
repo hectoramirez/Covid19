@@ -6,9 +6,12 @@
 > streamlit run 3.0App.py
 > ```
 > 
-> The final live app looked like in the following screenshot:
+> * The final live streamlit app looked like in the following screenshot:
 > 
 > ![Daily deaths GIF](plots/last_screenshot.png)
+> 
+> * The final state (2020/09/25) of a previous version is still accessible in this
+> [webpage](https://hectoramirez.github.io/covid/COVID19.html).
 
 ---
 
@@ -28,7 +31,7 @@ Set of charts automatically updated daily with [Apache Airflow](https://airflow.
 
 We use the [bokeh](https://bokeh.org) and [plotly](https://plotly.com) visualization libraries.
 
-### COVID19_notebook.ipynb
+### 2.0COVID19_notebook.ipynb
 
 Along the notebook, we
 1. Load and clean the data.
@@ -44,4 +47,4 @@ Series of scripts used for Airflow:
     * <b>covid_func.py</b> Reproduces the code in the Jupyter notebook.
     * <b>git_push.py</b> Commit/push of the plots to the GitHub Pages repository.
     
-The tracker is updated daily at 05:00 UTC.
+The tracker _was_ updated daily at 05:00 UTC.
