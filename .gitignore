@@ -1,58 +1,20 @@
 
-example_LiveCOVID19_data.ipynb
-COVID19_notebook-Copy1.ipynb
-Automated/Daily_confirmed.html
-Automated/Daily_deaths.html
-Automated/Geo_confirmed.html
-Automated/Geo_deaths.html
-Automated/top_confirmed cases.html
-Automated/top_deaths.html
-Automated/top_mortality.html
-Automated/top_recovered cases.html
-Automated/Daily_confirmed.html
-Automated/Daily_deaths.html
-Automated/Geo_confirmed.html
-Automated/Geo_deaths.html
-Automated/top_confirmed cases.html
-Automated/top_deaths.html
-Automated/top_mortality.html
-Automated/top_recovered cases.html
-Automated/Daily_confirmed.html
-Automated/Daily_deaths.html
-Automated/Geo_confirmed.html
-Automated/Geo_deaths.html
-Automated/top_confirmed cases.html
-Automated/top_deaths.html
-Automated/top_mortality.html
-Automated/top_recovered cases.html
-plotly_to_html.py
-COVID19_notebook-Copy2.ipynb
-.ipynb_checkpoints/COVID19_notebook-Copy2-checkpoint.ipynb
-.ipynb_checkpoints/COVID19_notebook-Copy1-checkpoint.ipynb
-.ipynb_checkpoints/COVID19_notebook-Copy1-checkpoint.ipynb
-Medium.ipynb
-rCOVID19_notebook-Copy1.ipynb
-rCOVID19_notebook-Copy2.ipynb
-2020-04-18 11.37.02 am.jpg
-untitled folder/COVID19-Explained through Visualizations.ipynb
-untitled folder/test.csv
-untitled folder/train.csv
-.idea
+.idea/
+.ipynb_checkpoints/
 /.ipynb_checkpoints/*
 /Automated/*.html
-.ipynb_checkpoints/2.0COVID19_notebook-checkpoint.ipynb
-.ipynb_checkpoints/2020-04-18 11.37.02 am-checkpoint.jpg
-.ipynb_checkpoints/COVID19_notebook-checkpoint.ipynb
-.ipynb_checkpoints/example_LiveCOVID19_data-checkpoint.ipynb
-.ipynb_checkpoints/LiveCOVID19_data-checkpoint.ipynb
-.ipynb_checkpoints/Medium-checkpoint.ipynb
-.ipynb_checkpoints/plotly_to_html-checkpoint.py
-.ipynb_checkpoints/rCOVID19_notebook-Copy1-checkpoint.ipynb
-.ipynb_checkpoints/rCOVID19_notebook-Copy2-checkpoint.ipynb
-.ipynb_checkpoints/README-checkpoint.md
-.ipynb_checkpoints/test-checkpoint.html
-untitled folder/.DS_Store
-Automated/.ipynb_checkpoints/covid_func-checkpoint.py
-Automated/.ipynb_checkpoints/covid_func-checkpoint.py
-Automated/.ipynb_checkpoints/covid_func-checkpoint.py
+Automated/*.html
+
+untitled folder/
+
+example_LiveCOVID19_data.ipynb
+COVID19_notebook-Copy1.ipynb
+COVID19_notebook-Copy2.ipynb
+rCOVID19_notebook-Copy1.ipynb
+rCOVID19_notebook-Copy2.ipynb
+Medium.ipynb
 Histograms for curve.ipynb
+
+plotly_to_html.py
+
+2020-04-18 11.37.02 am.jpg
