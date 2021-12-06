@@ -1,6 +1,6 @@
 # Live COVID-19 tracker with Airflow
 
-> **Note:** The app is no longer live and maintained. To run it locally you may clone the
+> **Note:** The app is no longer live or maintained. To run it locally you may clone the
 > repository, install all requirements in `requirements.txt`, and do
 > ```
 > streamlit run 3.0App.py
