@@ -1,6 +1,6 @@
 streamlit==0.62.1
 pandas==1.0.3
-numpy==1.18.5
+numpy==1.22.0
 datetime
 plotly==4.6.0
 plotly-express==0.4.1
